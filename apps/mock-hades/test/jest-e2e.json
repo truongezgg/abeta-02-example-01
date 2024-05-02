@@ -1,0 +1,25 @@
+{
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "@app/database-type-orm/(.*)": "<rootDir>/../libs/database-type-orm/src/$1",
+    "@app/database-type-orm": "<rootDir>/../libs/database-type-orm/src",
+    "@app/s3-upload/(.*)": "<rootDir>/../libs/s3-upload/src/$1",
+    "@app/s3-upload": "<rootDir>/../libs/s3-upload/src",
+    "@app/queue/(.*)": "<rootDir>/../libs/queue/src/$1",
+    "@app/queue": "<rootDir>/../libs/queue/src",
+    "@app/cache/(.*)": "<rootDir>/../libs/cache/src/$1",
+    "@app/cache": "<rootDir>/../libs/cache/src",
+    "@app/config/(.*)": "<rootDir>/../libs/config/src/$1",
+    "@app/config": "<rootDir>/../libs/config/src"
+  }
+}
