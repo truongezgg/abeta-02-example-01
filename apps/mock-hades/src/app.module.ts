@@ -10,6 +10,8 @@ import { ConfigService } from '@nestjs/config';
 import { IConfig } from './config';
 import { dataSource } from '@app/database-type-orm/dataSource';
 import config from './config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ChatMessageModule } from './chat-message/chat-message.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,9 +28,18 @@ import config from './config';
       },
       inject: [ConfigService],
     }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+        dbName: configService.get<string>('MONGODB_DB_NAME'),
+      }),
+      inject: [ConfigService],
+    }),
     PostModule,
     CommentModule,
     LikeModule,
+    ChatMessageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

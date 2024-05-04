@@ -27,8 +27,8 @@ export default class Post {
   @Column({ name: 'content', type: 'varchar', length: 255 })
   content: string;
 
-  @Column({ name: 'user_id', type: 'int' })
-  userId: number;
+  // @Column({ name: 'user_id', type: 'int' })
+  // userId: number;
 
   @ManyToOne(() => User, (user) => user.post)
   @JoinColumn({ name: 'user_id' })
@@ -44,7 +44,7 @@ export default class Post {
 
   @DeleteDateColumn({
     type: 'datetime',
-    name: 'created_at',
+    name: 'deleted_at',
     comment: 'Timestamp of creation',
     nullable: true,
   })

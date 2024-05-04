@@ -12,12 +12,6 @@ export default class Like {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column({ name: 'post_id', type: 'int' })
-  postId: number;
-
-  @Column({ name: 'user_id', type: 'int' })
-  userId: number;
-
   @ManyToOne(() => User, (user) => user.like)
   @JoinColumn({ name: 'user_id' })
   user: number;

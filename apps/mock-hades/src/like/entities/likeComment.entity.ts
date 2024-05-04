@@ -12,11 +12,11 @@ export default class LikeComment {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column('int', { name: 'user_id' })
-  userId: number;
+  // @Column('int', { name: 'user_id' })
+  // userId: number;
 
-  @Column('int', { name: 'comment_id' })
-  commentId: number;
+  // @Column('int', { name: 'comment_id' })
+  // commentId: number;
 
   @ManyToOne(() => User, (user) => user.likeCmt)
   @JoinColumn({ name: 'user_id' })

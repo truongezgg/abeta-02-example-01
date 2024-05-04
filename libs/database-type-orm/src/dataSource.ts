@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { DefaultEntities } from './entities';
-require('dotenv').config()
+import { DefaultMigrations } from './migrations';
+require('dotenv').config();
 export const dataSource = new DataSource({
   type: 'mysql',
   host: process.env.MYSQL_HOST,
@@ -12,7 +13,7 @@ export const dataSource = new DataSource({
   charset: 'utf8mb4',
   bigNumberStrings: false,
   entities: [...DefaultEntities],
-  migrations: [],
+  migrations: [...DefaultMigrations],
   subscribers: [],
   synchronize: false,
   logging: process.env.NODE_ENV !== 'production',
