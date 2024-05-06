@@ -1,3 +1,4 @@
+import { Post } from './Post.entity';
 import { CommonStatus } from '../../../core/src/constants/enum';
 import {
   Column,
@@ -59,7 +60,18 @@ export default class User {
   refreshToken: string;
 
   @OneToMany(() => Notification, (notifications) => notifications.userSend)
-  notifications: Notification[]
+  notifications: Notification[];
+
+  @Column({
+    name: 'invited_by',
+    type: 'bigint',
+    unsigned: true,
+    nullable: true,
+  })
+  invitedBy: number;
+
+  @OneToMany(() => Post, (post) => post.user)
+  post: Post[];
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

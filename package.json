@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./apps/abeta-example-01/test/jest-e2e.json",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d ./libs/database-type-orm/src/data-source.ts",
     "migration:create": "ts-node ./node_modules/typeorm/cli.js migration:create ./libs/database-type-orm/src/migrations",
-    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate ./libs/database-type-orm/src/migrations -d ./libs/database-type-orm/src/data-source.ts",
+    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate ./libs/database-type-orm/src/migrations/migrations -d ./libs/database-type-orm/src/data-source.ts",
     "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d ./libs/database-type-orm/src/data-source.ts"
   },
   "dependencies": {
@@ -32,6 +32,8 @@
     "@nestjs/typeorm": "^10.0.2",
     "bcrypt": "^5.1.1",
     "cache-manager": "^5.5.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "flat": "^6.0.1",
     "log4js": "^6.9.1",
     "mysql2": "^3.9.7",
