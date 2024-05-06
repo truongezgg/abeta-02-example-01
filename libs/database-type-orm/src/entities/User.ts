@@ -31,6 +31,14 @@ export default class User {
   name: string;
 
   @Column({
+    name: 'phone_number',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
+  phoneNumber: string;
+
+  @Column({
     name: 'status',
     type: 'tinyint',
     default: CommonStatus.ACTIVE,
@@ -38,15 +46,8 @@ export default class User {
   })
   status: number;
 
-  @Column({
-    name: 'is_super_admin',
-    type: 'tinyint',
-    default: CommonStatus.INACTIVE,
-  })
-  isSuperAdmin?: number;
-
-  @Column({ name: 'none_token', type: 'varchar', length: 100, nullable: true })
-  noneToken: string;
+  @Column({ name: 'reset_token', type: 'varchar', length: 100, nullable: true })
+  resetToken: string;
 
   @Column({
     name: 'refresh_token',
