@@ -43,26 +43,6 @@
       "compilerOptions": {
         "tsConfigPath": "libs/database-type-orm/tsconfig.lib.json"
       }
-    },
-    "abeta-example-01": {
-      "type": "application",
-      "root": "apps/abeta-example-01",
-      "entryFile": "main",
-      "sourceRoot": "apps/abeta-example-01/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/abeta-example-01/tsconfig.app.json"
-      }
-    },
-    "test-app": {
-      "type": "application",
-      "root": "apps/test-app",
-      "entryFile": "main",
-      "sourceRoot": "apps/test-app/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/test-app/tsconfig.app.json"
-      }
     }
-  },
-  "monorepo": true,
-  "root": "apps/abeta-example-01"
+  }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { DataSource } from 'typeorm';
 // import AuthorizationMigrations from '../../authorization/src/migrations';
 // import { AuthorizationEntities } from '../../authorization/src/entities';
@@ -36,7 +37,7 @@ export const dataSource = new DataSource({
     // ...AuthorizationMigrations,
     // ...ResourceMigrations,
     // ...LanguageMigrations,
-    ...ConfigMigrations,
+    // ...ConfigMigrations,
     // ...NotificationMigrations,
   ],
   subscribers: [],
