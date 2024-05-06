@@ -1,4 +1,3 @@
-
 import { Post } from './Post.entity';
 import { CommonStatus } from '../../../core/src/constants/enum';
 import {
@@ -10,6 +9,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import LikeComment from './likeComment.entity';
+import Comment from './comment.entity';
 
 @Entity('user')
 export default class User {
@@ -69,6 +70,12 @@ export default class User {
 
   @OneToMany(() => Post, (post) => post.user)
   post: Post[];
+
+  @OneToMany(() => LikeComment, (likeCmt) => likeCmt.user)
+  likeCmt: LikeComment[];
+
+  @OneToMany(() => Comment, (cmt) => cmt.user)
+  comment: Comment[];
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;
