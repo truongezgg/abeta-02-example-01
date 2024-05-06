@@ -1,10 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/abeta-example-01/src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "webpack": true
+    "webpack": true,
+    "tsConfigPath": "apps/abeta-example-01/tsconfig.app.json"
   },
   "projects": {
     "config": {
@@ -42,6 +43,26 @@
       "compilerOptions": {
         "tsConfigPath": "libs/database-type-orm/tsconfig.lib.json"
       }
+    },
+    "abeta-example-01": {
+      "type": "application",
+      "root": "apps/abeta-example-01",
+      "entryFile": "main",
+      "sourceRoot": "apps/abeta-example-01/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/abeta-example-01/tsconfig.app.json"
+      }
+    },
+    "mock_hades": {
+      "type": "application",
+      "root": "apps/mock_hades",
+      "entryFile": "main",
+      "sourceRoot": "apps/mock_hades/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/mock_hades/tsconfig.app.json"
+      }
     }
-  }
+  },
+  "monorepo": true,
+  "root": "apps/abeta-example-01"
 }

@@ -1,9 +1,11 @@
-import { CommonStatus, RoleId } from '../../../core/src/constants/enum';
+import { Post } from './Post.entity';
+import { CommonStatus } from '../../../core/src/constants/enum';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -62,6 +64,9 @@ export default class User {
     nullable: true,
   })
   invitedBy: number;
+
+  @OneToMany(() => Post, (post) => post.user)
+  post: Post[];
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

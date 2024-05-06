@@ -1,4 +1,4 @@
-import User from "./User"
-
-export const DefaultEntities = [User]
-export default  DefaultEntities
+import User from './User';
+import { Post } from './Post.entity';
+export const DefaultEntities = [User, Post];
+export default DefaultEntities;
