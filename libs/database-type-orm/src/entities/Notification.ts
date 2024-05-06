@@ -5,10 +5,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import User from './User';
+import UserNotification from './UserNotification.entity';
 
 @Entity('notification')
 export default class Notification {
@@ -27,6 +29,12 @@ export default class Notification {
   @ManyToOne(() => User, (user) => user.notifications)
   @JoinColumn({ name: 'sender_id' })
   userSend: User;
+
+  @OneToMany(
+    () => UserNotification,
+    (userNotifications) => userNotifications.notification,
+  )
+  userNotifications: UserNotification[];
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

@@ -1,13 +1,8 @@
 import User from './User';
-<<<<<<< HEAD
-import Notification from './notification';
-
-export const DefaultEntities = [User, Notification];
-export default DefaultEntities;
-=======
+import Notification from './Notification';
 import { Post } from './Post.entity';
-export const DefaultEntities = [User, Post];
+import UserNotification from "./UserNotification.entity";
 
+export const DefaultEntities = [User, Notification, Post, UserNotification];
 
-
->>>>>>> 4bad75c9b546365a14f60e1847a35d23ac343dc3
+export default DefaultEntities

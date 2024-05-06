@@ -9,7 +9,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import Notification from './notification';
+import Notification from './Notification';
+import UserNotification from './UserNotification.entity';
 
 @Entity('user')
 export default class User {
@@ -61,6 +62,12 @@ export default class User {
 
   @OneToMany(() => Notification, (notifications) => notifications.userSend)
   notifications: Notification[];
+
+  @OneToMany(
+    () => UserNotification,
+    (receiverNotifications) => receiverNotifications.userReceived,
+  )
+  receiverNotifications: UserNotification[];
 
   @Column({
     name: 'invited_by',
