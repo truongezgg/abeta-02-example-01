@@ -26,6 +26,9 @@ export default class Notification {
   @Column({ name: 'sender_id', type: 'bigint', unsigned: true })
   senderId: number;
 
+  @Column({ name: 'notification_id', type: 'bigint', unsigned: true })
+  notificationId: number;
+
   @ManyToOne(() => User, (user) => user.notifications)
   @JoinColumn({ name: 'sender_id' })
   userSend: User;
