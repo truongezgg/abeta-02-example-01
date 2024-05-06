@@ -5,7 +5,7 @@ import {
   ArgumentMetadata,
 } from '@nestjs/common';
 import { validate } from '../validate';
-import { AjvSchema } from "@app/core/types/AJVSchema";
+import { AjvSchema } from '@app/core/types/AJVSchema';
 
 @Injectable()
 export class ToIntPipe implements PipeTransform {

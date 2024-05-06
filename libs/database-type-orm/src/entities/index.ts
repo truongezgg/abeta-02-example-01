@@ -1,4 +1,4 @@
-import User from "./User"
+import User from './User';
 
-export const DefaultEntities = [User]
-export default  DefaultEntities
+export const DefaultEntities = [User];
+export default DefaultEntities;
