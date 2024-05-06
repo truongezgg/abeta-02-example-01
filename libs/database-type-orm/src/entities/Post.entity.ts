@@ -10,7 +10,11 @@ import {
   OneToMany,
 } from 'typeorm';
 import User from './User';
+
 import { LikedPost } from './LikedPost.entity';
+
+import Comment from './Comment.entity';
+
 
 @Entity('post')
 export class Post {
@@ -24,8 +28,13 @@ export class Post {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+
   @OneToMany(() => LikedPost, (likepost) => likepost.post)
   likedPost: Post[];
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comment: Comment[];
+
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;
