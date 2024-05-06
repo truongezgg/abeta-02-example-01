@@ -22,11 +22,11 @@ export default class Comment {
   @Column('varchar', { name: 'content' })
   content: string;
 
-  // @Column('int', { name: 'post_id' })
-  // postId: number;
+  @Column({ name: 'post_id', type: 'int', unsigned: true })
+  postId: number;
 
-  // @Column('int', { name: 'user_id' })
-  // userId: number;
+  @Column({ name: 'user_id', type: 'int', unsigned: true })
+  userId: number;
 
   @ManyToOne(() => User, (user) => user.comment)
   @JoinColumn({ name: 'user_id' })
