@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import LikeComment from './likeComment.entity';
-import Comment from './comment.entity';
+import Comment from './Comment.entity';
 
 @Entity('user')
 export default class User {
