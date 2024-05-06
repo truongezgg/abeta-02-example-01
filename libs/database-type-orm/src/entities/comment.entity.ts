@@ -6,7 +6,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import Post from './post.entity';
+import Post from './Post.entity';
 import LikeComment from './likeComment.entity';
 import User from './User';
 @Entity('comment')
