@@ -1,12 +1,14 @@
-import { CommonStatus, RoleId } from '../../../core/src/constants/enum';
+import { CommonStatus } from '../../../core/src/constants/enum';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import Notification from './notification';
 
 @Entity('user')
 export default class User {
@@ -55,6 +57,9 @@ export default class User {
     nullable: true,
   })
   refreshToken: string;
+
+  @OneToMany(() => Notification, (notifications) => notifications.userSend)
+  notifications: Notification[]
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;
