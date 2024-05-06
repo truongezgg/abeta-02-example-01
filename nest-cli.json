@@ -52,15 +52,6 @@
       "compilerOptions": {
         "tsConfigPath": "apps/abeta-example-01/tsconfig.app.json"
       }
-    },
-    "mock_hades": {
-      "type": "application",
-      "root": "apps/mock_hades",
-      "entryFile": "main",
-      "sourceRoot": "apps/mock_hades/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/mock_hades/tsconfig.app.json"
-      }
     }
   },
   "monorepo": true,
