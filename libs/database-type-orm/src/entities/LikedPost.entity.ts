@@ -1,40 +1,44 @@
 import {
-  Column,
   Entity,
   PrimaryGeneratedColumn,
   DeleteDateColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Column,
   ManyToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
 import User from './User';
+import { Post } from './Post.entity';
 
-import { LikedPost } from './LikedPost.entity';
-
-import Comment from './Comment.entity';
-
-
-@Entity('post')
-export class Post {
+@Entity('liked_post')
+export class LikedPost {
   @PrimaryGeneratedColumn({ name: 'id', type: 'bigint', unsigned: true })
   id: number;
 
-  @Column({ name: 'title', type: 'varchar', length: 255 })
-  title: string;
+  @Column({
+    name: 'post_id',
+    type: 'bigint',
+    unsigned: true,
+    comment: 'id of the liked post',
+  })
+  postId: number;
 
-  @ManyToOne(() => User, (user) => user.post)
+  @Column({
+    name: 'user_id',
+    type: 'bigint',
+    comment: 'id of the user likes the post',
+    unsigned: true,
+  })
+  userId: number;
+
+  @ManyToOne(() => User, (user) => user.userLike)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-
-  @OneToMany(() => LikedPost, (likepost) => likepost.post)
-  likedPost: Post[];
-
-  @OneToMany(() => Comment, (comment) => comment.post)
-  comment: Comment[];
-
+  @ManyToOne(() => Post, (post) => post.likedPost)
+  @JoinColumn({ name: 'post_id' })
+  post: Post;
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

@@ -2,6 +2,10 @@
 import { DataSource } from 'typeorm';
 // import AuthorizationMigrations from '../../authorization/src/migrations';
 // import { AuthorizationEntities } from '../../authorization/src/entities';
+
+import { DefaultEntities } from './entities';
+import { DefaultMigrations } from './migrations';
+
 // import ResourceEntities from '../../resource/src/entities';
 // import LanguageEntities from '../../language/src/entities';
 // import ResourceMigrations from '../../resource/src/migrations';
