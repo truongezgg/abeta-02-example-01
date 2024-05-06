@@ -1,9 +1,25 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "@app/config/(.*)": "<rootDir>/../libs/config/src/$1",
+    "@app/config": "<rootDir>/../libs/config/src",
+    "@app/core/(.*)": "<rootDir>/../libs/core/src/$1",
+    "@app/core": "<rootDir>/../libs/core/src",
+    "@app/helper/(.*)": "<rootDir>/../libs/helpers/src/$1",
+    "@app/helper": "<rootDir>/../libs/helpers/src",
+    "@app/cache/(.*)": "<rootDir>/../libs/cache/src/$1",
+    "@app/cache": "<rootDir>/../libs/cache/src",
+    "@app/database-type-orm/(.*)": "<rootDir>/../libs/database-type-orm/src/$1",
+    "@app/database-type-orm": "<rootDir>/../libs/database-type-orm/src"
   }
 }
