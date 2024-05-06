@@ -7,8 +7,10 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import User from './User';
+import Comment from './comment.entity';
 
 @Entity('post')
 export class Post {
@@ -21,6 +23,9 @@ export class Post {
   @ManyToOne(() => User, (user) => user.post)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comment: Comment[];
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;
