@@ -6,9 +6,10 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import Post from './post.entity';
+
 import LikeComment from './likeComment.entity';
 import User from './User';
+import { Post } from './Post.entity';
 @Entity('comment')
 export default class Comment {
   @PrimaryGeneratedColumn('increment', {
