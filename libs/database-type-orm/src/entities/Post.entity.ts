@@ -24,6 +24,12 @@ export class Post {
   @Column({ name: 'title', type: 'varchar', length: 255 })
   title: string;
 
+  @Column({ name: 'content', type: 'varchar', length: 500 })
+  content: string;
+
+  @Column({ name: 'user_id', type: 'bigint', unsigned: true })
+  userId: number;
+
   @ManyToOne(() => User, (user) => user.post)
   @JoinColumn({ name: 'user_id' })
   user: User;
