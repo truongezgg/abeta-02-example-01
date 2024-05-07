@@ -41,6 +41,12 @@
       ],
       "@app/database-type-orm/*": [
         "libs/database-type-orm/src/*"
+      ],
+      "@app/jwt-authentication": [
+        "libs/jwt-authentication/src"
+      ],
+      "@app/jwt-authentication/*": [
+        "libs/jwt-authentication/src/*"
       ]
     }
   }
