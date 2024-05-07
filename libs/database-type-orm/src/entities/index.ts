@@ -5,6 +5,7 @@ import UserNotification from './UserNotification.entity';
 import { LikedPost } from './LikedPost.entity';
 import LikeComment from './likeComment.entity';
 import Comment from './Comment.entity';
+import UserImage from './UserImage.entity';
 export const DefaultEntities = [
   User,
   Notification,
@@ -13,5 +14,6 @@ export const DefaultEntities = [
   LikeComment,
   Comment,
   LikedPost,
+  UserImage,
 ];
 export default DefaultEntities;

@@ -17,6 +17,7 @@ import { LikedPost } from './LikedPost.entity';
 
 import LikeComment from './likeComment.entity';
 import Comment from './Comment.entity';
+import UserImage from './UserImage.entity';
 
 @Entity('user')
 export default class User {
@@ -75,13 +76,8 @@ export default class User {
   )
   receiverNotifications: UserNotification[];
 
-  @Column({
-    name: 'invited_by',
-    type: 'bigint',
-    unsigned: true,
-    nullable: true,
-  })
-  invitedBy: number;
+  @OneToMany(() => UserImage, (images) => images.user)
+  images: UserImage[];
 
   @OneToMany(() => Post, (post) => post.user)
   post: Post[];
