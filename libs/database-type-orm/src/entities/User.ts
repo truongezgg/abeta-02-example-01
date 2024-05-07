@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
 import Notification from './Notification.entity';
 import UserNotification from './UserNotification.entity';
 
@@ -16,7 +17,6 @@ import { LikedPost } from './LikedPost.entity';
 
 import LikeComment from './likeComment.entity';
 import Comment from './Comment.entity';
-
 
 @Entity('user')
 export default class User {
@@ -86,7 +86,6 @@ export default class User {
   @OneToMany(() => Post, (post) => post.user)
   post: Post[];
 
-
   @OneToMany(() => LikedPost, (likepost) => likepost.user)
   userLike: LikedPost[];
 
@@ -95,7 +94,6 @@ export default class User {
 
   @OneToMany(() => Comment, (cmt) => cmt.user)
   comment: Comment[];
-
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;
