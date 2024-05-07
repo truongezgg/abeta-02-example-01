@@ -1,31 +1,31 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
   Column,
-  DeleteDateColumn,
+  PrimaryGeneratedColumn,
+  OneToOne,
   CreateDateColumn,
+  DeleteDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
-import User from './User';
 import Comment from './Comment.entity';
-@Entity('like_comment')
-export default class LikeComment {
-  @PrimaryGeneratedColumn('increment')
+
+@Entity('comment_image')
+export default class CommentImage {
+  @PrimaryGeneratedColumn('increment', {
+    type: 'int',
+    name: 'id',
+    unsigned: true,
+  })
   id: number;
 
-  @Column({ name: 'user_id', type: 'int', unsigned: true })
-  userId: number;
+  @Column('varchar', { name: 'url' })
+  content: string;
 
   @Column({ name: 'comment_id', type: 'int', unsigned: true })
   commentId: number;
 
-  @ManyToOne(() => User, (user) => user.likeCmt)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
-  @ManyToOne(() => Comment, (cmt) => cmt.likeCmt)
+  @OneToOne(() => Comment, (cmt) => cmt.commentImage)
   @JoinColumn({ name: 'comment_id' })
   comment: Comment;
 
