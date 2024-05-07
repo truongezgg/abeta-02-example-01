@@ -43,6 +43,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/database-type-orm/tsconfig.lib.json"
       }
+    },
+    "jwt-authentication": {
+      "type": "library",
+      "root": "libs/jwt-authentication",
+      "entryFile": "index",
+      "sourceRoot": "libs/jwt-authentication/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/jwt-authentication/tsconfig.lib.json"
+      }
     }
   }
 }
