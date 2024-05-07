@@ -6,9 +6,6 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-
-import Post from './Post.entity';
-
 import LikeComment from './likeComment.entity';
 import User from './User';
 import { Post } from './Post.entity';
