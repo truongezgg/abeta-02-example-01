@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import User from './User';
-import Notification from './Notification';
+import Notification from './Notification.entity';
 
 @Entity('user_notification')
 export default class UserNotification {
