@@ -16,32 +16,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "@app/config": [
-        "libs/config/src"
-      ],
-      "@app/config/*": [
-        "libs/config/src/*"
-      ],
-      "@app/core": [
-        "libs/core/src"
-      ],
-      "@app/core/*": [
-        "libs/core/src/*"
-      ],
-      "@app/helpers": [
-        "libs/helpers/src"
-      ],
-      "@app/helpers/*": [
-        "libs/helpers/src/*"
-      ],
-      "@app/database-type-orm": [
-        "libs/database-type-orm/src"
-      ],
-      "@app/database-type-orm/*": [
-        "libs/database-type-orm/src/*"
-      ]
-    }
+    "noFallthroughCasesInSwitch": false
   }
 }
