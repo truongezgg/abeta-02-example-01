@@ -8,6 +8,7 @@ import Comment from './Comment.entity';
 import { PostImage } from './postImage.entity';
 import UserImage from './UserImage.entity';
 import CommentImage from './CommentImage.entity';
+import EmailOtp from './EmailOtp.entity';
 
 export const DefaultEntities = [
   User,
@@ -20,5 +21,6 @@ export const DefaultEntities = [
   PostImage,
   UserImage,
   CommentImage,
+  EmailOtp,
 ];
 export default DefaultEntities;

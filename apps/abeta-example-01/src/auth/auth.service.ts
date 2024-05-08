@@ -9,12 +9,19 @@ import { Exception } from '@app/core/exception';
 import { ErrorCode } from '@app/core/constants/enum';
 import { UserService } from '../user/user.service';
 import { Request } from 'express';
+import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
+import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
+import { ResetPasswordDto } from './dtos/ResetPassword.dto';
+import { CheckOtpDto } from './dtos/CheckOtp.dto';
+import { isAfter, addMinutes } from 'date-fns';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(EmailOtp)
+    private otpRepository: Repository<EmailOtp>,
     private jwtAuthService: JwtAuthenticationService,
     private userService: UserService,
   ) {}
@@ -67,10 +74,83 @@ export class AuthService {
   async getProfile(req: Request) {
     const token = this.jwtAuthService.extractFromAuthHeaderAsBearerToken(req);
     const info = this.jwtAuthService.verifyAccessToken(token);
-    return info['email'];
+    return await this.userService.findOneById(info['id']);
   }
 
-  public generateRandomResetToken() {
+  async forgetPassword(forgetDto: ForgetPasswordDto) {
+    const existedUser = await this.userRepository.findOne({
+      where: {
+        email: forgetDto.email,
+      },
+    });
+    if (!existedUser) {
+      throw new Exception(ErrorCode.User_Not_Found, 'User Not Found');
+    }
+    const otpRecords = await this.otpRepository.find({
+      where: {
+        user_id: existedUser.id,
+      },
+    });
+    for (const otpRecord of otpRecords) {
+      otpRecord.isExpired = true;
+      await this.otpRepository.save(otpRecord);
+    }
+    const otp = Math.random().toString(20).substring(2, 12);
+    await this.otpRepository.save({
+      otp: otp,
+      user_id: existedUser.id,
+      isExpired: false,
+    });
+  }
+
+  async checkOtp(checkOtpDto: CheckOtpDto) {
+    const otp = await this.otpRepository.findOne({
+      where: {
+        otp: checkOtpDto.otp,
+        isExpired: false,
+      },
+    });
+    if (!otp) {
+      throw new Exception(ErrorCode.OTP_Invalid);
+    }
+    const expiredTime = addMinutes(otp.createdAt, 5);
+    if (isAfter(new Date(), expiredTime)) {
+      throw new Exception(ErrorCode.OTP_Expired);
+    }
+    return {
+      message: 'OTP is valid',
+    };
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const hashedPassword = await bcrypt.hash(resetPasswordDto.password, 12);
+    const user = this.userService.findOneByEmail(resetPasswordDto.email);
+    if (!user) {
+      throw new Exception(ErrorCode.User_Not_Found);
+    }
+    await this.userRepository.update(
+      { email: resetPasswordDto.email },
+      { password: hashedPassword },
+    );
+    return {
+      message: 'Reset Password Successfully',
+    };
+  }
+
+  public async refreshTokens(refreshToken: string) {
+    const user = this.jwtAuthService.verifyRefreshToken(refreshToken);
+    if (!user) {
+      throw new Exception(ErrorCode.User_Not_Found);
+    }
+    const newRefreshToken = this.jwtAuthService.generateRefreshToken({
+      id: user.id,
+      email: user.email,
+      resetToken: user.resetToken,
+    });
+    await this.userService.updateRefreshToken(user.id, refreshToken);
+    return { refreshToken: newRefreshToken };
+  }
+  private generateRandomResetToken() {
     const characters =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let token = '';
@@ -83,11 +163,7 @@ export class AuthService {
     return token;
   }
 
-  public comparePassword(dtoPassword: string, userPassword: string): boolean {
-    return bcrypt.compareSync(dtoPassword, userPassword);
-  }
-
-  public async generateTokensAndSave(user: User) {
+  private async generateTokensAndSave(user: User) {
     const accessToken = this.jwtAuthService.generateAccessToken({
       id: user.id,
       email: user.email,

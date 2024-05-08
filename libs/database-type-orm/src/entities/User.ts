@@ -18,6 +18,7 @@ import { LikedPost } from './LikedPost.entity';
 import LikeComment from './likeComment.entity';
 import Comment from './Comment.entity';
 import UserImage from './UserImage.entity';
+import EmailOtp from './EmailOtp.entity';
 
 @Entity('user')
 export default class User {
@@ -67,6 +68,12 @@ export default class User {
   })
   refreshToken: string;
 
+  @Column({ name: 'date_of_birth', type: 'varchar' })
+  dateOfBirth: string;
+
+  @Column({ name: 'address', type: 'varchar' })
+  address: string;
+
   @OneToMany(() => Notification, (notifications) => notifications.userSend)
   notifications: Notification[];
 
@@ -90,6 +97,9 @@ export default class User {
 
   @OneToMany(() => Comment, (cmt) => cmt.user)
   comment: Comment[];
+
+  @OneToMany(() => EmailOtp, (otps) => otps.user)
+  otps: EmailOtp[];
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

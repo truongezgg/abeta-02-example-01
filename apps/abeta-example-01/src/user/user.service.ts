@@ -29,4 +29,15 @@ export class UserService {
   public async findOneByEmail(email: string) {
     return this.userRepository.findOneBy({ email: email });
   }
+
+  public async findOneById(id: number) {
+    return this.userRepository.findOneBy({ id: id });
+  }
+
+  updateRefreshToken(id: number, refreshToken) {
+    return this.userRepository.update(
+      { id: id },
+      { refreshToken: refreshToken },
+    );
+  }
 }
