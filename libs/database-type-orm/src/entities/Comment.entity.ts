@@ -8,12 +8,11 @@ import {
   DeleteDateColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne,
 } from 'typeorm';
 import LikeComment from './likeComment.entity';
 import User from './User';
 import { Post } from './Post.entity';
-import CommentImage from './CommentImage.entity';
+
 @Entity('comment')
 export default class Comment {
   @PrimaryGeneratedColumn('increment', {
