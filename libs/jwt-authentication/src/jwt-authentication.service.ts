@@ -4,7 +4,7 @@ import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { Request } from 'express';
 import { JwtAuthenticationModuleOptions } from './jwt-authentication.interface';
 import { MODULE_OPTIONS_TOKEN } from './jwt-authentication.module-definition';
-import { LiteralObject } from "@nestjs/common/cache";
+import { LiteralObject } from '@nestjs/common/cache';
 
 @Injectable()
 export class JwtAuthenticationService {

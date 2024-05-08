@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import config, { IConfig, IConfigAuth, validateConfig } from './config';
-import { JwtAuthenticationModule } from '@app/jwt-authentication';
+import { CommentModule } from './comment/comment.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSource } from '@app/database-type-orm/data-source';
+import config, { IConfig, IConfigAuth, validateConfig } from './config';
+import { JwtAuthenticationModule } from '@app/jwt-authentication';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 
@@ -34,6 +35,7 @@ import { UserModule } from './user/user.module';
       },
       inject: [ConfigService],
     }),
+    CommentModule,
     AuthModule,
     UserModule,
   ],
