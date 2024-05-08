@@ -25,7 +25,7 @@ export default class CommentImage {
   @Column({ name: 'comment_id', type: 'int', unsigned: true })
   commentId: number;
 
-  @OneToOne(() => Comment, (cmt) => cmt.commentImage)
+  @OneToOne(() => Comment, (cmt) => cmt.id)
   @JoinColumn({ name: 'comment_id' })
   comment: Comment;
 

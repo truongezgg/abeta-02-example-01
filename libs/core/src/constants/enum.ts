@@ -39,6 +39,9 @@ export enum ErrorCode {
   Task_Duplicate = 'Task_Duplicate',
   Task_Not_Found = 'Task_Not_Found',
   Update_Task_Fail = 'Update_Task_Fail',
+
+  OTP_Invalid = 'OTP_Invalid',
+  OTP_Expired = 'OTP_Expired'
 }
 
 export enum Environment {
