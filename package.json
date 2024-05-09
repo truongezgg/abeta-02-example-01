@@ -100,7 +100,7 @@
       "^@app/helper(|/.*)$": "<rootDir>/libs/helpers/src/$1",
       "^@app/database-type-orm(|/.*)$": "<rootDir>/libs/database-type-orm/src/$1",
       "^@app/jwt-authentication(|/.*)$": "<rootDir>/libs/jwt-authentication/src/$1",
-      "^@app/node-mailer(|/.*)$": "<rootDir>/libs/node-mailer/src/$1"
+      "^@app/node-mailer(|/.*)$": "<rootDir>/libs/node-mailer/src/$1",
       "^@app/s3-upload(|/.*)$": "<rootDir>/libs/s3-upload/src/$1"
     }
   }
