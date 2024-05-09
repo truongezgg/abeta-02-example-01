@@ -30,6 +30,15 @@ export class Post {
   @Column({ name: 'user_id', type: 'bigint', unsigned: true })
   userId: number;
 
+  @Column({
+    name: 'status',
+    type: 'int',
+    unsigned: true,
+    default: 1,
+    comment: '1: active, 0: not active',
+  })
+  status: number;
+
   @ManyToOne(() => User, (user) => user.post)
   @JoinColumn({ name: 'user_id' })
   user: User;

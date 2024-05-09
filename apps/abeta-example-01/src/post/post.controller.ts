@@ -25,12 +25,14 @@ class requestUser {
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  //Create Post
   @ApiBearerAuth()
   @Post()
   create(@Body() createPostDto: CreatePostDto, @User() user: requestUser) {
     return this.postService.create({ ...createPostDto }, user.id);
   }
 
+  // Get all post of user
   @ApiBearerAuth()
   @Get()
   async findAll(
@@ -43,6 +45,7 @@ export class PostController {
     return this.postService.findAllMyPosts(page, pageSize, user.id);
   }
 
+  //Get all post of friend
   @ApiBearerAuth()
   @Get('/friendpost')
   async findAllFriendPost(
@@ -52,23 +55,53 @@ export class PostController {
   ) {
     page = page || 1;
     pageSize = pageSize || 10;
-    return this.postService.findAllFriendPosts(user.id, page, pageSize);
+    return await this.postService.findAllFriendPosts(user.id, page, pageSize);
   }
 
+  // Review a Post
+  @ApiBearerAuth()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+  async findOne(@Param('id') id: string, @User() user) {
+    const post = await this.postService.findOne(parseInt(id), user.id);
+    if (post === null)
+      return {
+        status: 'No data.',
+      };
+    else return post;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+  @ApiBearerAuth()
+  @Patch('/delete/:id')
+  async deletePost(@Param('id') id: string, @User() user) {
+    const deleted = new Date().toISOString();
+    const updated = new Date().toISOString();
+    return await this.postService.deletePost(
+      parseInt(id),
+      deleted,
+      updated,
+      user.id,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  @ApiBearerAuth()
+  @Patch('/update/:id')
+  async updatePost(
+    @Param('id') id: string,
+    @User() user,
+    @Body() updateDto: UpdatePostDto,
+  ) {
+    const updated = new Date().toISOString();
+    return await this.postService.updatePost(
+      parseInt(id),
+      user.id,
+      updated,
+      updateDto,
+    );
   }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.postService.remove(+id);
+  // }
 }
 
 /*

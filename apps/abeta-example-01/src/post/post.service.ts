@@ -17,11 +17,12 @@ export class PostService {
   ) {}
 
   // tao bai post
-  create(createPostDto: CreatePostDto, id: number) {
+  create(createPostDto: CreatePostDto, userId: number) {
     try {
       const post = this.postRepository.create({
-        ...createPostDto,
-        userId: id,
+        title: createPostDto.title,
+        content: createPostDto.content,
+        userId,
       });
 
       const result = this.postRepository.save(post);
@@ -71,45 +72,102 @@ export class PostService {
 
   /// lasy tat ca cac bai post cua nhung ng da ket ban
   async findAllFriendPosts(userId: number, page: number, pageSize: number) {
-    const skip = (page - 1) * pageSize;
-    const allFriend = (
-      await this.requestMakeFriendService.findAll(page, pageSize, userId)
-    ).arrayPosts;
-    const arrayNew = [];
-    let sum = 0;
-    if (allFriend.length > 0) {
-      for (let i = 0; i < allFriend.length; i++) {
-        const [all, count] = await this.postRepository
-          .createQueryBuilder('post')
-          .innerJoinAndSelect('post.user', 'user', 'user.id = :id', {
-            id: allFriend[i].id,
-          })
-          .take(pageSize)
-          .skip(skip)
-          .getManyAndCount();
-        arrayNew.push(all);
-        sum += count;
+    try {
+      const skip = (page - 1) * pageSize;
+      const allFriend = (
+        await this.requestMakeFriendService.findAll(page, pageSize, userId)
+      ).arrayPosts;
+      const arrayNew = [];
+      let sum = 0;
+      if (allFriend.length > 0) {
+        for (let i = 0; i < allFriend.length; i++) {
+          const [all, count] = await this.postRepository
+            .createQueryBuilder('post')
+            .innerJoinAndSelect('post.user', 'user', 'user.id = :id', {
+              id: allFriend[i].id,
+            })
+            .take(pageSize)
+            .skip(skip)
+            .getManyAndCount();
+          arrayNew.push(all);
+          sum += count;
+        }
       }
+      return {
+        arrayPost: arrayNew,
+        countPost: sum,
+      };
+    } catch {
+      throw new HttpException(
+        'Internal Server',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    return {
-      arrayPost: arrayNew,
-      countPost: sum,
-    };
   }
 
-  findOne(id: number) {
-    const result = this.postRepository.findOne({ where: { id } });
-
-    return result;
+  async findOne(id: number, userId: number): Promise<Post | null> {
+    // console.log('var');
+    try {
+      const result = await this.postRepository.findOne({
+        where: { id, userId },
+      });
+      return result;
+      // console.log(result);
+    } catch {
+      throw new HttpException(
+        'Internal Server',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  deletePost(id: number, updatePostDto: UpdatePostDto) {
-    const result = this.postRepository.update({ id }, updatePostDto);
-    return result;
+  async deletePost(
+    id: number,
+    deletedAt: string,
+    updatedAt: string,
+    userId: number,
+  ) {
+    try {
+      const result = await this.postRepository.update(
+        {
+          id,
+          userId,
+        },
+        { deletedAt, updatedAt },
+      );
+      return result;
+    } catch {
+      throw new HttpException(
+        'Internal Server',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  remove(id: number) {
-    const result = this.postRepository.delete({ id });
-    return result;
+  async updatePost(
+    id: number,
+    userId: number,
+    updatedAt: string,
+    updateDto: UpdatePostDto,
+  ) {
+    try {
+      const result = await this.postRepository.update(
+        {
+          id,
+          userId,
+        },
+        { title: updateDto.title, content: updateDto.content, updatedAt },
+      );
+      return result;
+    } catch {
+      throw new HttpException(
+        'Internal Server',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
+  // remove(id: number) {
+  //   const result = this.postRepository.delete({ id });
+  //   return result;
+  // }
 }
