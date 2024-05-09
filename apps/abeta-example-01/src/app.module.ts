@@ -16,6 +16,7 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from '@app/core/filters/http-exception.filter';
 import { TransformResponseInterceptor } from '@app/core/interceptors/transform-res.interceptor';
 import { NodeMailerModule } from '@app/node-mailer';
+import { LikeCommentModule } from './likeComment/likeComment.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { NodeMailerModule } from '@app/node-mailer';
     AuthModule,
     UserModule,
     NodeMailerModule,
+    LikeCommentModule,
   ],
   controllers: [AppController],
   providers: [
