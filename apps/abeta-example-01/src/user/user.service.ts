@@ -44,15 +44,10 @@ export class UserService {
   }
 
   async uploadImage(file) {
-    console.log('inside upload service');
     const storage = this.firebaseService.getStorageInstance();
-    console.log(storage);
     const bucket = storage.bucket();
-    console.log(bucket);
     const fileName = `${Date.now()}_${file.originalname}`;
-    console.log(fileName);
     const fileUpload = bucket.file(fileName);
-    console.log(fileUpload);
     const stream = fileUpload.createWriteStream({
       metadata: {
         contentType: file.mimeType,

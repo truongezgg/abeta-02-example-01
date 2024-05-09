@@ -60,6 +60,8 @@
       "sourceRoot": "libs/node-mailer/src",
       "compilerOptions": {
         "tsConfigPath": "libs/node-mailer/tsconfig.lib.json"
+      }
+    },
     "s3-upload": {
       "type": "library",
       "root": "libs/s3-upload",
