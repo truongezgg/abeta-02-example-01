@@ -18,6 +18,7 @@ import { LikedPost } from './LikedPost.entity';
 import LikeComment from './likeComment.entity';
 import Comment from './Comment.entity';
 import UserImage from './UserImage.entity';
+import { RequestMakeFriend } from './ReuestMakeFriend.entity';
 
 @Entity('user')
 export default class User {
@@ -90,6 +91,12 @@ export default class User {
 
   @OneToMany(() => Comment, (cmt) => cmt.user)
   comment: Comment[];
+
+  @OneToMany(() => RequestMakeFriend, (req) => req.sender)
+  requestSender: RequestMakeFriend[];
+
+  @OneToMany(() => RequestMakeFriend, (req) => req.receiver)
+  requestReceiver: RequestMakeFriend[];
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

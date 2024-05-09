@@ -1,17 +1,20 @@
+/* eslint-disable prettier/prettier */
 import { Unauthorized } from '@app/core/exception';
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { Request } from 'express';
 import { JwtAuthenticationModuleOptions } from './jwt-authentication.interface';
 import { MODULE_OPTIONS_TOKEN } from './jwt-authentication.module-definition';
-import { LiteralObject } from "@nestjs/common/cache";
+import { LiteralObject } from '@nestjs/common/cache';
+import { UserService } from 'apps/abeta-example-01/src/user/user.service';
+import { decode } from 'punycode';
 
 @Injectable()
 export class JwtAuthenticationService {
   constructor(
     private readonly jwtService: JwtService,
-    @Inject(MODULE_OPTIONS_TOKEN)
-    public options: JwtAuthenticationModuleOptions,
+    // @Inject(MODULE_OPTIONS_TOKEN)
+    // public options: JwtAuthenticationModuleOptions,
   ) {}
 
   async validateRequest(request: Request) {
@@ -19,11 +22,12 @@ export class JwtAuthenticationService {
 
     try {
       const decoded = this.jwtService.verify<LiteralObject>(token, {
-        secret: this.options.secretOrKey,
+        secret: process.env.JWT_SECRET_KEY,
         algorithms: ['HS256'],
       });
 
-      Object.assign(request, { payload: decoded });
+      Object.assign(request, { user: decoded });
+      request['user'] = decoded;
       return true;
     } catch (error) {
       throw new Unauthorized(
@@ -41,22 +45,22 @@ export class JwtAuthenticationService {
 
   public generateAccessToken(payload: LiteralObject): string {
     return this.jwtService.sign(payload, {
-      secret: this.options.secretOrKey,
-      expiresIn: this.options.accessTokenExpiredIn,
+      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
     });
   }
 
   public generateRefreshToken(payload: LiteralObject): string {
     return this.jwtService.sign(payload, {
-      secret: this.options.secretOrKey,
-      expiresIn: this.options.refreshTokenExpiredIn,
+      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
     });
   }
 
   public verifyAccessToken(accessToken: string) {
     try {
       const payload = this.jwtService.verify(accessToken, {
-        secret: this.options.secretOrKey,
+        secret: process.env.JWT_SECRET_KEY,
       });
       return payload;
     } catch (error) {
@@ -67,7 +71,7 @@ export class JwtAuthenticationService {
   public verifyRefreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken, {
-        secret: this.options.secretOrKey,
+        secret: process.env.JWT_SECRET_KEY,
       });
       return payload;
     } catch (error) {

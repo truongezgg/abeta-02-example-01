@@ -8,7 +8,7 @@ import Comment from './Comment.entity';
 import { PostImage } from './postImage.entity';
 import UserImage from './UserImage.entity';
 import CommentImage from './CommentImage.entity';
-
+import { RequestMakeFriend } from './ReuestMakeFriend.entity';
 export const DefaultEntities = [
   User,
   Notification,
@@ -20,5 +20,6 @@ export const DefaultEntities = [
   PostImage,
   UserImage,
   CommentImage,
+  RequestMakeFriend,
 ];
 export default DefaultEntities;

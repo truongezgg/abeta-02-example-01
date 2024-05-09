@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Controller,
   Get,
@@ -6,29 +7,52 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Request } from 'express';
-interface CustomRequest extends Request {
-  payload?: any; // Define the 'payload' property as optional
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { User } from '@app/jwt-authentication/user.decorator';
+import { LiteralObject } from '@nestjs/common/cache';
+
+class requestUser {
+  id: number;
+  name: string;
 }
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @UseGuards()
+  @ApiBearerAuth()
   @Post()
-  create(@Body() createPostDto: CreatePostDto, req: CustomRequest) {
-    // return this.postService.create({ ...createPostDto, req.payload });
-    console.log(req.payload);
+  create(@Body() createPostDto: CreatePostDto, @User() user: requestUser) {
+    return this.postService.create({ ...createPostDto }, user.id);
   }
 
+  @ApiBearerAuth()
   @Get()
-  findAll() {
-    return this.postService.findAll();
+  async findAll(
+    @User() user: LiteralObject,
+    @Query('page', ParseIntPipe) page?: number,
+    @Query('pageSize', ParseIntPipe) pageSize?: number,
+  ) {
+    page = page || 1;
+    pageSize = pageSize || 10;
+    return this.postService.findAllMyPosts(page, pageSize, user.id);
+  }
+
+  @ApiBearerAuth()
+  @Get('/friendpost')
+  async findAllFriendPost(
+    @User() user: LiteralObject,
+    @Query('page', ParseIntPipe) page?: number,
+    @Query('pageSize', ParseIntPipe) pageSize?: number,
+  ) {
+    page = page || 1;
+    pageSize = pageSize || 10;
+    return this.postService.findAllFriendPosts(user.id, page, pageSize);
   }
 
   @Get(':id')
@@ -46,3 +70,12 @@ export class PostController {
     return this.postService.remove(+id);
   }
 }
+
+/*
+Test user
+{
+"name":"test1",
+"password":"12345"
+}
+
+*/

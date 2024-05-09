@@ -8,7 +8,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSource } from '@app/database-type-orm/data-source';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-
+import { PostModule } from './post/post.module';
+import { ExceptionFilterModule } from '@app/exception-filter';
+import { RequestMakeFriendModule } from './request_make_friend/request_make_friend.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,6 +38,9 @@ import { UserModule } from './user/user.module';
     }),
     AuthModule,
     UserModule,
+    PostModule,
+    ExceptionFilterModule,
+    RequestMakeFriendModule,
   ],
   controllers: [AppController],
   providers: [AppService],
