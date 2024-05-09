@@ -52,6 +52,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/jwt-authentication/tsconfig.lib.json"
       }
+    },
+    "node-mailer": {
+      "type": "library",
+      "root": "libs/node-mailer",
+      "entryFile": "index",
+      "sourceRoot": "libs/node-mailer/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/node-mailer/tsconfig.lib.json"
+      }
     }
   }
 }

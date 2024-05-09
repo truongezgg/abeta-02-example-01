@@ -18,33 +18,29 @@ import {
   FileInterceptor,
 } from '@nestjs/platform-express';
 
-@UseGuards(JwtAuthenticationGuard)
+@ApiBearerAuth()
 @Controller('user')
 @ApiTags('User')
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @ApiBearerAuth()
   @ApiBody({ schema: { type: 'object', properties: {} } })
   @Patch('update/:id')
   async update(@Param('id') id: number, @Body() updateData: Partial<User>) {
     return this.userService.update(id, updateData);
   }
 
-  @ApiBearerAuth()
   @Get('getById/:id')
   async findOneById(@Param('id') id: number) {
     return this.userService.findOneById(id);
   }
 
-  @ApiBearerAuth()
   @Get('getByEmail/:email')
   async findOneByEmail(@Param('email') email: string) {
     return this.userService.findOneByEmail(email);
   }
 
-  @ApiBearerAuth()
-  @Post()
+  @Post('upload')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -58,7 +54,11 @@ export class UserController {
     },
   })
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     console.log(file);
+    const imageUrl = await this.userService.uploadImage(file);
+    return {
+      url: imageUrl,
+    };
   }
 }

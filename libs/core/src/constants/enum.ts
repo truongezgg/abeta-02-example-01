@@ -10,6 +10,8 @@ export enum ErrorCode {
 
   Email_Already_Exist = 'Email_Already_Exist',
   Email_Or_Password_Not_valid = 'Email_Or_Password_Not_valid',
+  Email_Not_Valid = 'Email_Not_Valid',
+  Password_Not_Valid = 'Password_Not_Valid',
   Resource_Already_Exists = 'Resource_Already_Exists',
   Can_Not_Disable_Default_language = 'Can_Not_Disable_Default_language',
 
@@ -39,12 +41,10 @@ export enum ErrorCode {
   Task_Duplicate = 'Task_Duplicate',
   Task_Not_Found = 'Task_Not_Found',
   Update_Task_Fail = 'Update_Task_Fail',
-
   OTP_Invalid = 'OTP_Invalid',
   OTP_Expired = 'OTP_Expired',
   Post_Not_Found = 'Post_Not_Found',
   Comment_Not_Found = 'Comment_Not_Found',
-
 }
 
 export enum Environment {

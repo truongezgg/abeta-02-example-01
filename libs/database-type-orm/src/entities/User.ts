@@ -68,10 +68,10 @@ export default class User {
   })
   refreshToken: string;
 
-  @Column({ name: 'date_of_birth', type: 'varchar' })
+  @Column({ name: 'date_of_birth', type: 'varchar', default: null })
   dateOfBirth: string;
 
-  @Column({ name: 'address', type: 'varchar' })
+  @Column({ name: 'address', type: 'varchar', default: null })
   address: string;
 
   @OneToMany(() => Notification, (notifications) => notifications.userSend)
