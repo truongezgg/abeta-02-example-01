@@ -52,6 +52,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/jwt-authentication/tsconfig.lib.json"
       }
+    },
+    "s3-upload": {
+      "type": "library",
+      "root": "libs/s3-upload",
+      "entryFile": "index",
+      "sourceRoot": "libs/s3-upload/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/s3-upload/tsconfig.lib.json"
+      }
     }
   }
 }

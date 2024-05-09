@@ -9,6 +9,7 @@ import config, { IConfig, IConfigAuth, validateConfig } from './config';
 import { JwtAuthenticationModule } from '@app/jwt-authentication';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { LikeCommentModule } from './likeComment/likeComment.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { UserModule } from './user/user.module';
     CommentModule,
     AuthModule,
     UserModule,
+    LikeCommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

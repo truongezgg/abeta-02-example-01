@@ -36,7 +36,7 @@ export class Exception extends CustomExceptionFactory {
    *   throw Exception("Something_Went_Wrong", "This is error description", HttpStatus.BAD_REQUEST, { isSystem: true })
    */
   constructor(
-    errorCode: ErrorCode,
+    errorCode: ErrorCode | any,
     devMessage?: string | any,
     statusCode?: HttpStatus,
     payload?: any,
