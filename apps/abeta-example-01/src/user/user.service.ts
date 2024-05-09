@@ -4,17 +4,19 @@ import User from '@app/database-type-orm/entities/User';
 import { Repository } from 'typeorm';
 import { Exception } from '@app/core/exception';
 import { ErrorCode } from '@app/core/constants/enum';
+import { FirebaseService } from './firebase.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private firebaseService: FirebaseService,
   ) {}
 
   public async create(user: any) {
     const newUser = this.userRepository.create(user);
-    await this.userRepository.save(newUser);
+    return await this.userRepository.save(newUser);
   }
 
   public async update(id: number, updateData: Partial<User>) {
@@ -39,5 +41,32 @@ export class UserService {
       { id: id },
       { refreshToken: refreshToken },
     );
+  }
+
+  async uploadImage(file) {
+    console.log('inside upload service');
+    const storage = this.firebaseService.getStorageInstance();
+    console.log(storage);
+    const bucket = storage.bucket();
+    console.log(bucket);
+    const fileName = `${Date.now()}_${file.originalname}`;
+    console.log(fileName);
+    const fileUpload = bucket.file(fileName);
+    console.log(fileUpload);
+    const stream = fileUpload.createWriteStream({
+      metadata: {
+        contentType: file.mimeType,
+      },
+    });
+    return new Promise((resolve, reject) => {
+      stream.on('error', (err) => {
+        reject(err);
+      });
+      stream.on('finish', () => {
+        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${fileName}`;
+        resolve(imageUrl);
+      });
+      stream.end(file.buffer);
+    });
   }
 }

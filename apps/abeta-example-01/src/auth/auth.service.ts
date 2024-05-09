@@ -10,11 +10,12 @@ import { ErrorCode } from '@app/core/constants/enum';
 import { UserService } from '../user/user.service';
 import { Request } from 'express';
 import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
-import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { ResetPasswordDto } from './dtos/ResetPassword.dto';
+import { addMinutes, isAfter } from 'date-fns';
+import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { CheckOtpDto } from './dtos/CheckOtp.dto';
-import { isAfter, addMinutes } from 'date-fns';
-
+import { NodeMailerService } from '@app/node-mailer';
+require('dotenv').config();
 @Injectable()
 export class AuthService {
   constructor(
@@ -24,26 +25,28 @@ export class AuthService {
     private otpRepository: Repository<EmailOtp>,
     private jwtAuthService: JwtAuthenticationService,
     private userService: UserService,
+    private mailService: NodeMailerService,
   ) {}
 
   public async register(registerDto: RegisterAuthDto) {
-    registerDto.password = bcrypt.hashSync(
-      registerDto.password,
-      bcrypt.genSaltSync(),
-    );
     const existedUser = await this.userRepository.findOneBy({
       email: registerDto.email,
     });
     if (existedUser) {
       throw new Exception(ErrorCode.Email_Already_Exist, 'Email already exist');
     }
+    const password = bcrypt.hashSync(
+      registerDto.password,
+      bcrypt.genSaltSync(),
+    );
     const resetToken = this.generateRandomResetToken();
-    await this.userService.create({
+    const user = await this.userService.create({
       email: registerDto.email,
-      password: registerDto.password,
+      password: password,
       resetToken: resetToken,
     });
-    const user = await this.userService.findOneByEmail(registerDto.email);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     return this.generateTokensAndSave(user);
   }
 
@@ -59,14 +62,11 @@ export class AuthService {
         resetToken: true,
       },
     });
-    if (
-      !existedUser ||
-      !bcrypt.compareSync(loginDto.password, existedUser.password)
-    ) {
-      throw new Exception(
-        ErrorCode.Email_Or_Password_Not_valid,
-        'Email or password not valid',
-      );
+    if (!existedUser) {
+      throw new Exception(ErrorCode.Email_Not_Valid);
+    }
+    if (!bcrypt.compareSync(loginDto.password, existedUser.password)) {
+      throw new Exception(ErrorCode.Password_Not_Valid);
     }
     return this.generateTokensAndSave(existedUser);
   }
@@ -101,6 +101,15 @@ export class AuthService {
       user_id: existedUser.id,
       isExpired: false,
     });
+    await this.mailService.send(
+      existedUser.email,
+      'Reset Your Password',
+      './reset-password',
+      { otp },
+    );
+    return {
+      message: 'Check your email',
+    };
   }
 
   async checkOtp(checkOtpDto: CheckOtpDto) {
@@ -113,7 +122,11 @@ export class AuthService {
     if (!otp) {
       throw new Exception(ErrorCode.OTP_Invalid);
     }
-    const expiredTime = addMinutes(otp.createdAt, 5);
+    const expiredTime = addMinutes(
+      otp.createdAt,
+      parseInt(process.env.BCRYPT_HASH_ROUND),
+    );
+
     if (isAfter(new Date(), expiredTime)) {
       throw new Exception(ErrorCode.OTP_Expired);
     }
@@ -123,7 +136,10 @@ export class AuthService {
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const hashedPassword = await bcrypt.hash(resetPasswordDto.password, 12);
+    const hashedPassword = await bcrypt.hash(
+      resetPasswordDto.password,
+      parseInt(process.env.BCRYPT_HASH_ROUND),
+    );
     const user = this.userService.findOneByEmail(resetPasswordDto.email);
     if (!user) {
       throw new Exception(ErrorCode.User_Not_Found);

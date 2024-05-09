@@ -1,24 +1,16 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Req } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { LoginAuthDto, RegisterAuthDto } from './dtos/login.dto';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { JwtAuthenticationGuard } from '@app/jwt-authentication';
 import { Public } from '@app/core/decorators/public.decorator';
 import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { ResetPasswordDto } from './dtos/ResetPassword.dto';
 import { CheckOtpDto } from './dtos/CheckOtp.dto';
+import { UserPayload } from './decorators/user.decorators';
 
-@UseGuards(JwtAuthenticationGuard)
+@ApiBearerAuth()
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -39,10 +31,9 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @ApiBearerAuth()
   @Get('profile')
-  getProfile(@Req() req: Request) {
-    return this.authService.getProfile(req);
+  getProfile(@UserPayload() payload: any) {
+    return payload;
   }
 
   @Public()
@@ -63,7 +54,6 @@ export class AuthController {
     return this.authService.resetPassword(resetDto);
   }
 
-  @ApiBearerAuth()
   @Put('refresh')
   refreshToken(@Req() req: Request) {
     const refreshToken = req.headers.authorization

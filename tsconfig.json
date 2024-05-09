@@ -48,6 +48,11 @@
       "@app/jwt-authentication/*": [
         "libs/jwt-authentication/src/*"
       ],
+      "@app/node-mailer": [
+        "libs/node-mailer/src"
+      ],
+      "@app/node-mailer/*": [
+        "libs/node-mailer/src/*"
       "@app/s3-upload": [
         "libs/s3-upload/src"
       ],
