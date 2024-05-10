@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import User from './User';
 import Comment from './Comment.entity';
+import { CommonStatus } from '../../../core/src/constants/enum';
 @Entity('like_comment')
 export default class LikeComment {
   @PrimaryGeneratedColumn('increment')
@@ -28,6 +29,14 @@ export default class LikeComment {
   @ManyToOne(() => Comment, (cmt) => cmt.likeCmt)
   @JoinColumn({ name: 'comment_id' })
   comment: Comment;
+
+  @Column({
+    name: 'status',
+    type: 'tinyint',
+    default: CommonStatus.ACTIVE,
+    unsigned: true,
+  })
+  status: number;
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

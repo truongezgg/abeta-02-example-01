@@ -15,6 +15,7 @@ import { LikedPost } from './LikedPost.entity';
 
 import Comment from './Comment.entity';
 import { PostImage } from './postImage.entity';
+import { CommonStatus } from '../../../core/src/constants/enum';
 
 @Entity('post')
 export class Post {

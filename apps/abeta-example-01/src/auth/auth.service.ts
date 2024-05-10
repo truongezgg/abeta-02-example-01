@@ -147,7 +147,6 @@ export class AuthService {
   }
 
   async changePassword(id: number, changeDto: ChangePasswordDto) {
-    console.log('id: ' + id)
     const existedUser = await this.userRepository.findOne({
       where: {
         id: id,
@@ -161,7 +160,6 @@ export class AuthService {
     if (!existedUser) {
       throw new Exception(ErrorCode.User_Not_Found);
     }
-    console.log(existedUser)
     if (!bcrypt.compareSync(changeDto.oldPassword, existedUser.password)) {
       throw new Exception(ErrorCode.Password_Not_Valid);
     }

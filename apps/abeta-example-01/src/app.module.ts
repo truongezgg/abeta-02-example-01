@@ -22,7 +22,8 @@ import { AllExceptionsFilter } from '@app/core/filters/http-exception.filter';
 import { TransformResponseInterceptor } from '@app/core/interceptors/transform-res.interceptor';
 import { NodeMailerModule } from '@app/node-mailer';
 import { LikeCommentModule } from './likeComment/likeComment.module';
-
+import { LikePostModule } from './likePost/likePost.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -59,7 +60,8 @@ import { LikeCommentModule } from './likeComment/likeComment.module';
 
     NodeMailerModule,
     LikeCommentModule,
-
+    LikePostModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

@@ -9,6 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import Comment from './Comment.entity';
+import { CommonStatus } from '../../../core/src/constants/enum';
 
 @Entity('comment_image')
 export default class CommentImage {
@@ -28,6 +29,14 @@ export default class CommentImage {
   @OneToOne(() => Comment, (cmt) => cmt.id)
   @JoinColumn({ name: 'comment_id' })
   comment: Comment;
+
+  @Column({
+    name: 'status',
+    type: 'tinyint',
+    default: CommonStatus.ACTIVE,
+    unsigned: true,
+  })
+  status: number;
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;
