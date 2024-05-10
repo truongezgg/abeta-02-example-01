@@ -8,7 +8,7 @@ import { Post } from '@app/database-type-orm/entities/Post.entity';
 import Comment from '@app/database-type-orm/entities/Comment.entity';
 import { CommentDto } from './dto/comment.dto';
 import { Exception } from '@app/core/exception';
-import { ErrorCode } from '@app/core/constants/enum';
+import { CommonStatus, ErrorCode } from '@app/core/constants/enum';
 import { v2 as cloudinary } from 'cloudinary';
 import { assignPaging, returnPaging } from '@app/helpers/utils';
 import CommentImage from '@app/database-type-orm/entities/CommentImage.entity';
@@ -46,7 +46,7 @@ export class CommentService {
     }
 
     const post = await this.postRepository.findOne({
-      where: { id: createCommentDto.postId, deletedAt: null },
+      where: { id: createCommentDto.postId, status: CommonStatus.ACTIVE },
     });
 
     if (!post) {
@@ -57,7 +57,6 @@ export class CommentService {
       user: user,
       post: post,
       content: createCommentDto.content,
-      image,
     };
     const comment = await this.commentRepository.save(cmt);
 
@@ -67,6 +66,7 @@ export class CommentService {
         const result = await cloudinary.uploader.upload(image.path);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         imageComment = result.secure_url;
+        console.log(imageComment);
       } catch (error) {
         throw new Error(`Failed to upload image: ${error.message}`);
       }
@@ -78,10 +78,8 @@ export class CommentService {
     }
 
     return {
-      data: {
-        ...comment,
-        imageComment: imageComment,
-      },
+      ...comment,
+      imageComment: imageComment,
     };
   }
 
@@ -90,7 +88,7 @@ export class CommentService {
     const comment = await this.commentRepository.find({
       where: {
         postId: commentDto.postId,
-        deletedAt: null,
+        status: CommonStatus.ACTIVE,
       },
       relations: ['user', 'post'],
       skip: params.skip,
@@ -100,7 +98,7 @@ export class CommentService {
     const totalComments = await this.commentRepository.count({
       where: {
         postId: commentDto.postId,
-        deletedAt: null,
+        status: CommonStatus.ACTIVE,
       },
     });
 
@@ -114,43 +112,79 @@ export class CommentService {
     const comment = await this.commentRepository.findOne({
       where: {
         id: commentId,
-        deletedAt: null,
+        status: CommonStatus.ACTIVE,
       },
       relations: ['user', 'post'],
     });
     if (!comment) {
       throw new Exception(ErrorCode.Comment_Not_Found);
     }
-
     return {
-      data: {
-        comment,
-      },
+      comment,
     };
   }
 
-  async update(commentId: number, updateCommentDto: UpdateCommentDto, userId) {
+  async update(
+    commentId: number,
+    updateCommentDto: UpdateCommentDto,
+    userId,
+    image,
+  ) {
     const comment = await this.commentRepository.findOne({
       where: {
         id: commentId,
         user: {
           id: userId,
         },
-        deletedAt: null,
+        status: CommonStatus.ACTIVE,
       },
+      withDeleted: true,
       relations: ['user', 'post'],
     });
+
     if (comment) {
-      await this.commentRepository.update(commentId, updateCommentDto);
-      comment.content = updateCommentDto.content;
-      return {
-        data: {
-          comment,
-        },
-      };
+      await this.commentRepository.update(comment.id, {
+        content: updateCommentDto.content,
+      });
     } else {
       throw new Exception(ErrorCode.Comment_Not_Found);
     }
+
+    const image_comment = await this.commentImageRepository.findOne({
+      where: {
+        commentId: commentId,
+        status: CommonStatus.ACTIVE,
+      },
+    });
+
+    let url;
+    if (image) {
+      try {
+        const result = await cloudinary.uploader.upload(image.path);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        url = result.secure_url;
+      } catch (error) {
+        throw new Error(`Failed to upload image: ${error.message}`);
+      }
+      if (!image_comment) {
+        const imageCmt = {
+          commentId: comment.id,
+          url: url,
+        };
+        await this.commentImageRepository.save(imageCmt);
+      }
+
+      if (image_comment) {
+        await this.commentImageRepository.update(image_comment.id, {
+          url: url,
+        });
+      }
+    }
+
+    return {
+      ...comment,
+      imageComment: url,
+    };
   }
 
   async remove(commentId: number, userId) {
@@ -160,11 +194,12 @@ export class CommentService {
         user: {
           id: userId,
         },
-        deletedAt: null,
+        status: CommonStatus.ACTIVE,
       },
     });
     if (comment) {
       await this.commentRepository.update(commentId, {
+        status: CommonStatus.INACTIVE,
         deletedAt: new Date().toISOString(),
       });
       throw new Exception(

@@ -46,14 +46,22 @@ export class CommentController {
     return this.commentService.findOne(+commentId);
   }
 
-  @Patch(':id')
+  @Post('edit:id')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('image'))
   update(
     @AuthUser() { id },
     @Param('id') commentId: string,
+    @UploadedFile() image: Express.Multer.File,
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
     const userId = +id;
-    return this.commentService.update(+commentId, updateCommentDto, userId);
+    return this.commentService.update(
+      +commentId,
+      updateCommentDto,
+      userId,
+      image,
+    );
   }
 
   @Delete(':id')
