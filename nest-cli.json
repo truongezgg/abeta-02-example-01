@@ -53,6 +53,15 @@
         "tsConfigPath": "libs/jwt-authentication/tsconfig.lib.json"
       }
     },
+
+    "exception-filter": {
+      "type": "library",
+      "root": "libs/exception-filter",
+      "entryFile": "index",
+      "sourceRoot": "libs/exception-filter/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/exception-filter/tsconfig.lib.json"
+
     "node-mailer": {
       "type": "library",
       "root": "libs/node-mailer",
@@ -69,6 +78,7 @@
       "sourceRoot": "libs/s3-upload/src",
       "compilerOptions": {
         "tsConfigPath": "libs/s3-upload/tsconfig.lib.json"
+
       }
     }
   }
