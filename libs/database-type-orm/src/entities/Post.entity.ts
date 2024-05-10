@@ -31,6 +31,15 @@ export class Post {
   @Column({ name: 'user_id', type: 'bigint', unsigned: true })
   userId: number;
 
+  @Column({
+    name: 'status',
+    type: 'int',
+    unsigned: true,
+    default: 1,
+    comment: '1: active, 0: not active',
+  })
+  status: number;
+
   @ManyToOne(() => User, (user) => user.post)
   @JoinColumn({ name: 'user_id' })
   user: User;
@@ -43,14 +52,6 @@ export class Post {
 
   @OneToMany(() => Comment, (comment) => comment.post)
   comment: Comment[];
-
-  @Column({
-    name: 'status',
-    type: 'tinyint',
-    default: CommonStatus.ACTIVE,
-    unsigned: true,
-  })
-  status: number;
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

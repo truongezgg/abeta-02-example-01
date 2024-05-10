@@ -10,11 +10,11 @@ import { ErrorCode } from '@app/core/constants/enum';
 import { UserService } from '../user/user.service';
 import { Request } from 'express';
 import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
-import { ResetPasswordDto } from './dtos/ResetPassword.dto';
+import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { addMinutes, isAfter } from 'date-fns';
 import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
-import { CheckOtpDto } from './dtos/CheckOtp.dto';
 import { NodeMailerService } from '@app/node-mailer';
+import { ChangePasswordDto } from './dtos/changePassword.dto';
 require('dotenv').config();
 @Injectable()
 export class AuthService {
@@ -112,40 +112,63 @@ export class AuthService {
     };
   }
 
-  async checkOtp(checkOtpDto: CheckOtpDto) {
+  async resetPassword(resetDto: ResetPasswordDto) {
     const otp = await this.otpRepository.findOne({
       where: {
-        otp: checkOtpDto.otp,
+        otp: resetDto.otp,
         isExpired: false,
       },
     });
     if (!otp) {
       throw new Exception(ErrorCode.OTP_Invalid);
     }
-    const expiredTime = addMinutes(
-      otp.createdAt,
-      parseInt(process.env.BCRYPT_HASH_ROUND),
-    );
-
-    if (isAfter(new Date(), expiredTime)) {
-      throw new Exception(ErrorCode.OTP_Expired);
-    }
-    return {
-      message: 'OTP is valid',
-    };
-  }
-
-  async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const hashedPassword = await bcrypt.hash(
-      resetPasswordDto.password,
-      parseInt(process.env.BCRYPT_HASH_ROUND),
-    );
-    const user = this.userService.findOneByEmail(resetPasswordDto.email);
+    const user = await this.userService.findOneById(otp.user_id);
     if (!user) {
       throw new Exception(ErrorCode.User_Not_Found);
     }
+    const expiredTime = addMinutes(
+      otp.createdAt,
+      parseInt(process.env.OTP_EXPIRY_TIME),
+    );
+    if (isAfter(new Date(), expiredTime)) {
+      throw new Exception(ErrorCode.OTP_Expired);
+    }
+    const hashedPassword = await bcrypt.hash(
+      resetDto.password,
+      parseInt(process.env.BCRYPT_HASH_ROUND),
+    );
     await this.userRepository.update(
-      { email: resetPasswordDto.email },
+      { id: otp.user_id },
+      { password: hashedPassword },
+    );
+    return {
+      message: 'Reset Password Successfully',
+    };
+  }
+
+  async changePassword(id: number, changeDto: ChangePasswordDto) {
+    const existedUser = await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+      select: {
+        email: true,
+        password: true,
+        resetToken: true,
+      },
+    });
+    if (!existedUser) {
+      throw new Exception(ErrorCode.User_Not_Found);
+    }
+    if (!bcrypt.compareSync(changeDto.oldPassword, existedUser.password)) {
+      throw new Exception(ErrorCode.Password_Not_Valid);
+    }
+    const hashedPassword = await bcrypt.hash(
+      changeDto.newPassword,
+      parseInt(process.env.BCRYPT_HASH_ROUND),
+    );
+    await this.userRepository.update(
+      { id: id },
       { password: hashedPassword },
     );
     return {

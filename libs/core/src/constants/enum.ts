@@ -45,6 +45,7 @@ export enum ErrorCode {
   OTP_Expired = 'OTP_Expired',
   Post_Not_Found = 'Post_Not_Found',
   Comment_Not_Found = 'Comment_Not_Found',
+  Notification_Not_Found = 'Notification_Not_Found',
 }
 
 export enum Environment {

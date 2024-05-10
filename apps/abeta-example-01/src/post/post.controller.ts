@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Controller,
   Get,
@@ -6,43 +7,108 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Request } from 'express';
-interface CustomRequest extends Request {
-  payload?: any; // Define the 'payload' property as optional
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { User } from '@app/jwt-authentication/user.decorator';
+import { LiteralObject } from '@nestjs/common/cache';
+
+class requestUser {
+  id: number;
+  name: string;
 }
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @UseGuards()
+  //Create Post
+  @ApiBearerAuth()
   @Post()
-  create(@Body() createPostDto: CreatePostDto, req: CustomRequest) {
-    // return this.postService.create({ ...createPostDto, req.payload });
-    console.log(req.payload);
+  create(@Body() createPostDto: CreatePostDto, @User() user: requestUser) {
+    return this.postService.create({ ...createPostDto }, user.id);
   }
 
+  // Get all post of user
+  @ApiBearerAuth()
   @Get()
-  findAll() {
-    return this.postService.findAll();
+  async findAll(
+    @User() user: LiteralObject,
+    @Query('page', ParseIntPipe) page?: number,
+    @Query('pageSize', ParseIntPipe) pageSize?: number,
+  ) {
+    page = page || 1;
+    pageSize = pageSize || 10;
+    return this.postService.findAllMyPosts(page, pageSize, user.id);
   }
 
+  //Get all post of friend
+  @ApiBearerAuth()
+  @Get('/friendpost')
+  async findAllFriendPost(
+    @User() user: LiteralObject,
+    @Query('page', ParseIntPipe) page?: number,
+    @Query('pageSize', ParseIntPipe) pageSize?: number,
+  ) {
+    page = page || 1;
+    pageSize = pageSize || 10;
+    return await this.postService.findAllFriendPosts(user.id, page, pageSize);
+  }
+
+  // Review a Post
+  @ApiBearerAuth()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+  async findOne(@Param('id') id: string, @User() user) {
+    const post = await this.postService.findOne(parseInt(id), user.id);
+    if (post === null)
+      return {
+        status: 'No data.',
+      };
+    else return post;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+  @ApiBearerAuth()
+  @Patch('/delete/:id')
+  async deletePost(@Param('id') id: string, @User() user) {
+    const deleted = new Date().toISOString();
+    const updated = new Date().toISOString();
+    return await this.postService.deletePost(
+      parseInt(id),
+      deleted,
+      updated,
+      user.id,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  @ApiBearerAuth()
+  @Patch('/update/:id')
+  async updatePost(
+    @Param('id') id: string,
+    @User() user,
+    @Body() updateDto: UpdatePostDto,
+  ) {
+    const updated = new Date().toISOString();
+    return await this.postService.updatePost(
+      parseInt(id),
+      user.id,
+      updated,
+      updateDto,
+    );
   }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.postService.remove(+id);
+  // }
 }
+
+/*
+Test user
+{
+"name":"test1",
+"password":"12345"
+}
+
+*/

@@ -1,4 +1,3 @@
-import { Migrations1715325987610 } from './1715325987610-migrations';
-
-export const DefaultMigrations = [Migrations1715325987610];
+import { Migrations1715206666551 } from './1715206666551-migrations';
+export const DefaultMigrations = [Migrations1715206666551];
 export default DefaultMigrations;
