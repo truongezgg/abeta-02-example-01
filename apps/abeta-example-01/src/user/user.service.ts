@@ -9,21 +9,15 @@ import { ErrorCode } from '@app/core/constants/enum';
 import { JwtAuthenticationService } from '@app/jwt-authentication';
 import { access } from 'fs';
 import { PassportSerializer } from '@nestjs/passport';
-=======
 import { FirebaseService } from './firebase.service';
-
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-
-
     private jwtAuthentication: JwtAuthenticationService,
-=======
     private firebaseService: FirebaseService,
-
   ) {}
 
   public async create(user: any) {
@@ -44,7 +38,6 @@ export class UserService {
     return this.userRepository.findOneBy({ email: email });
   }
 
-
   public async validateUser(username: string, password: string) {
     const user = await this.userRepository.findOne({
       where: { name: username },
@@ -60,7 +53,7 @@ export class UserService {
     }
 
     return null;
-=======
+  }
   public async findOneById(id: number) {
     return this.userRepository.findOneBy({ id: id });
   }
@@ -92,6 +85,5 @@ export class UserService {
       });
       stream.end(file.buffer);
     });
-
   }
 }

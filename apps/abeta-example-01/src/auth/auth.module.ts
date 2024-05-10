@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import User from '@app/database-type-orm/entities/User';
 import { UserModule } from '../user/user.module';
 import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
-import { NodeMailerModule, NodeMailerService } from '@app/node-mailer';
+import { NodeMailerModule } from '@app/node-mailer';
 
 @Module({
   imports: [

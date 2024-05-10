@@ -108,7 +108,7 @@ export default class User {
 
   @OneToMany(() => RequestMakeFriend, (req) => req.receiver)
   requestReceiver: RequestMakeFriend[];
-=======
+
   @OneToMany(() => EmailOtp, (otps) => otps.user)
   otps: EmailOtp[];
 
