@@ -61,7 +61,8 @@
       "sourceRoot": "libs/exception-filter/src",
       "compilerOptions": {
         "tsConfigPath": "libs/exception-filter/tsconfig.lib.json"
-
+      }
+    },
     "node-mailer": {
       "type": "library",
       "root": "libs/node-mailer",
@@ -70,6 +71,7 @@
       "compilerOptions": {
         "tsConfigPath": "libs/node-mailer/tsconfig.lib.json"
       }
+    }
     },
     "s3-upload": {
       "type": "library",
@@ -81,5 +83,4 @@
 
       }
     }
-  }
 }

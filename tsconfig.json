@@ -54,7 +54,7 @@
       ],
       "@app/exception-filter/*": [
         "libs/exception-filter/src/*"
-
+      ],
       "@app/node-mailer": [
         "libs/node-mailer/src"
       ],

@@ -6,11 +6,6 @@ import User from '@app/database-type-orm/entities/User';
 
 import { JwtAuthenticationModule } from '@app/jwt-authentication';
 
-@Module({
-  imports: [TypeOrmModule.forFeature([User]), JwtAuthenticationModule],
-  exports: [UserService],
-  providers: [UserService],
-=======
 import { FirebaseService } from './firebase.service';
 
 @Module({

@@ -23,7 +23,6 @@ import { RequestMakeFriend } from './ReuestMakeFriend.entity';
 
 import EmailOtp from './EmailOtp.entity';
 
-
 @Entity('user')
 export default class User {
   @PrimaryGeneratedColumn({ name: 'id', type: 'bigint', unsigned: true })
@@ -102,16 +101,14 @@ export default class User {
   @OneToMany(() => Comment, (cmt) => cmt.user)
   comment: Comment[];
 
-
   @OneToMany(() => RequestMakeFriend, (req) => req.sender)
   requestSender: RequestMakeFriend[];
 
   @OneToMany(() => RequestMakeFriend, (req) => req.receiver)
   requestReceiver: RequestMakeFriend[];
-=======
+
   @OneToMany(() => EmailOtp, (otps) => otps.user)
   otps: EmailOtp[];
-
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;
