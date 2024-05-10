@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import User from './User';
 import { Post } from './Post.entity';
+import { CommonStatus } from '../../../core/src/constants/enum';
 
 @Entity('liked_post')
 export class LikedPost {
@@ -39,6 +40,14 @@ export class LikedPost {
   @ManyToOne(() => Post, (post) => post.likedPost)
   @JoinColumn({ name: 'post_id' })
   post: Post;
+
+  @Column({
+    name: 'status',
+    type: 'tinyint',
+    default: CommonStatus.ACTIVE,
+    unsigned: true,
+  })
+  status: number;
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

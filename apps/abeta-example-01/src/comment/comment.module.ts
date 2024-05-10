@@ -15,9 +15,6 @@ import CommentImage from '@app/database-type-orm/entities/CommentImage.entity';
     TypeOrmModule.forFeature([User, Comment, Post, CommentImage]),
     MulterModule.register({
       storage: diskStorage({
-        destination: (req, file, cb) => {
-          cb(null, 'uploads/');
-        },
         filename: (req, file, cb) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
