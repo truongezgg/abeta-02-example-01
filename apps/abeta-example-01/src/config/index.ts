@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { dataSource } from '@app/database-type-orm/data-source';
 require('dotenv').config();
 import { first } from 'lodash';

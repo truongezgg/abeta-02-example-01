@@ -31,7 +31,7 @@ import { NotificationModule } from './notification/notification.module';
       isGlobal: true,
       load: [() => config],
       cache: true,
-      validate: validateConfig,
+      // validate: validateConfig,
     }),
     JwtAuthenticationModule.registerAsync({
       imports: [ConfigModule],
