@@ -6,8 +6,10 @@ import { Request } from 'express';
 import { JwtAuthenticationModuleOptions } from './jwt-authentication.interface';
 import { MODULE_OPTIONS_TOKEN } from './jwt-authentication.module-definition';
 import { LiteralObject } from '@nestjs/common/cache';
+
 import { UserService } from 'apps/abeta-example-01/src/user/user.service';
 import { decode } from 'punycode';
+
 
 @Injectable()
 export class JwtAuthenticationService {

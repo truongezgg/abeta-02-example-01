@@ -48,11 +48,25 @@
       "@app/jwt-authentication/*": [
         "libs/jwt-authentication/src/*"
       ],
+
       "@app/exception-filter": [
         "libs/exception-filter/src"
       ],
       "@app/exception-filter/*": [
         "libs/exception-filter/src/*"
+
+      "@app/node-mailer": [
+        "libs/node-mailer/src"
+      ],
+      "@app/node-mailer/*": [
+        "libs/node-mailer/src/*"
+        ],
+      "@app/s3-upload": [
+        "libs/s3-upload/src"
+      ],
+      "@app/s3-upload/*": [
+        "libs/s3-upload/src/*"
+
       ]
     }
   }

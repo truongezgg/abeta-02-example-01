@@ -53,6 +53,7 @@
         "tsConfigPath": "libs/jwt-authentication/tsconfig.lib.json"
       }
     },
+
     "exception-filter": {
       "type": "library",
       "root": "libs/exception-filter",
@@ -60,6 +61,24 @@
       "sourceRoot": "libs/exception-filter/src",
       "compilerOptions": {
         "tsConfigPath": "libs/exception-filter/tsconfig.lib.json"
+
+    "node-mailer": {
+      "type": "library",
+      "root": "libs/node-mailer",
+      "entryFile": "index",
+      "sourceRoot": "libs/node-mailer/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/node-mailer/tsconfig.lib.json"
+      }
+    },
+    "s3-upload": {
+      "type": "library",
+      "root": "libs/s3-upload",
+      "entryFile": "index",
+      "sourceRoot": "libs/s3-upload/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/s3-upload/tsconfig.lib.json"
+
       }
     }
   }

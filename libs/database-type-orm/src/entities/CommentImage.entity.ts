@@ -20,12 +20,12 @@ export default class CommentImage {
   id: number;
 
   @Column('varchar', { name: 'url' })
-  content: string;
+  url: string;
 
   @Column({ name: 'comment_id', type: 'int', unsigned: true })
   commentId: number;
 
-  @OneToOne(() => Comment, (cmt) => cmt.commentImage)
+  @OneToOne(() => Comment, (cmt) => cmt.id)
   @JoinColumn({ name: 'comment_id' })
   comment: Comment;
 

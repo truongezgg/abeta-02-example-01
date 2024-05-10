@@ -4,9 +4,15 @@ import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import User from '@app/database-type-orm/entities/User';
 import { UserModule } from '../user/user.module';
+import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
+import { NodeMailerModule, NodeMailerService } from '@app/node-mailer';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), UserModule],
+  imports: [
+    TypeOrmModule.forFeature([User, EmailOtp]),
+    UserModule,
+    NodeMailerModule,
+  ],
   exports: [AuthService],
   providers: [AuthService],
   controllers: [AuthController],
