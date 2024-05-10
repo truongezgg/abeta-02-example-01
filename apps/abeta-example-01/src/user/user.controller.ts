@@ -84,7 +84,6 @@ export class UserController {
   })
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
     const imageUrl = await this.userService.uploadImage(file);
     return {
       url: imageUrl,
