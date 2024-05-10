@@ -6,9 +6,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Public } from '@app/core/decorators/public.decorator';
 import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
-import { ResetPasswordDto } from './dtos/ResetPassword.dto';
-import { CheckOtpDto } from './dtos/CheckOtp.dto';
-import { UserPayload } from './decorators/user.decorators';
+import { ResetPasswordDto } from './dtos/resetPassword.dto';
+import { AuthUser } from './decorators/user.decorator';
+import { ChangePasswordDto } from './dtos/changePassword.dto';
 
 @ApiBearerAuth()
 @ApiTags('Auth')
@@ -32,7 +32,7 @@ export class AuthController {
   }
 
   @Get('profile')
-  getProfile(@UserPayload() payload: any) {
+  getProfile(@AuthUser() payload: any) {
     return payload;
   }
 
@@ -43,15 +43,14 @@ export class AuthController {
   }
 
   @Public()
-  @Post('check-otp')
-  checkOtp(@Body() checkOtpDto: CheckOtpDto) {
-    return this.authService.checkOtp(checkOtpDto);
-  }
-
-  @Public()
   @Post('reset-password')
   resetPassword(@Body() resetDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetDto);
+  }
+
+  @Post('change-password')
+  changePassword(@AuthUser() { id }, @Body() changeDto: ChangePasswordDto) {
+    return this.authService.changePassword(id, changeDto);
   }
 
   @Put('refresh')
