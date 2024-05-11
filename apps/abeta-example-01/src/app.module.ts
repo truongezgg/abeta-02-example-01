@@ -20,7 +20,7 @@ import { RequestMakeFriendModule } from './request_make_friend/request_make_frie
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from '@app/core/filters/http-exception.filter';
 import { TransformResponseInterceptor } from '@app/core/interceptors/transform-res.interceptor';
-import { NodeMailerModule } from '@app/node-mailer';
+// import { NodeMailerModule } from '@app/node-mailer';
 import { LikeCommentModule } from './likeComment/likeComment.module';
 
 
@@ -30,7 +30,7 @@ import { LikeCommentModule } from './likeComment/likeComment.module';
       isGlobal: true,
       load: [() => config],
       cache: true,
-      validate: validateConfig,
+      // validate: validateConfig,
     }),
     JwtAuthenticationModule.registerAsync({
       imports: [ConfigModule],
@@ -57,7 +57,7 @@ import { LikeCommentModule } from './likeComment/likeComment.module';
     ExceptionFilterModule,
     RequestMakeFriendModule,
 
-    NodeMailerModule,
+    // NodeMailerModule,
     LikeCommentModule,
 
   ],
