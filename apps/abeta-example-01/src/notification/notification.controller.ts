@@ -13,7 +13,7 @@ import { Public } from '@app/core/decorators/public.decorator';
 import { CreateNotificationDto } from './dtos/createNotification.dto';
 import User from '@app/database-type-orm/entities/User';
 import { AuthUser } from '../auth/decorators/user.decorator';
-import { PagingDto } from "./dtos/paging.dto";
+import { PagingDto } from './dtos/paging.dto';
 
 @ApiBearerAuth()
 @ApiTags('Notification')
