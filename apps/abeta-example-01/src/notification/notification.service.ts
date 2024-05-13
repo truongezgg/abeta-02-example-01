@@ -43,6 +43,7 @@ export class NotificationService {
       notificationId: newNotification.id,
       read: false,
     });
+
     const msg = await this.oneSignal.pushNotification(
       newNotification.title,
       newNotification.content,
