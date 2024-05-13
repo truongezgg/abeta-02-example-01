@@ -33,6 +33,14 @@ export default class UserImage {
   })
   image_type: number;
 
+  @Column({
+    name: 'is_avatar',
+    type: 'boolean',
+    comment: 'true: is current avatar, false: old avatar',
+    default: false,
+  })
+  isAvatar: boolean;
+
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;
 
