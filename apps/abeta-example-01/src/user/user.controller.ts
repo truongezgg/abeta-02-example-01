@@ -1,4 +1,3 @@
-
 import { Body, Controller, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';

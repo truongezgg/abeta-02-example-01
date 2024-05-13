@@ -41,20 +41,23 @@ export class UserService {
   }
 
   public async validateUser(username: string, password: string) {
-    const user = await this.userRepository.findOne({
-      where: { name: username },
-      select: ['id', 'email', 'phoneNumber', 'password', 'name'],
-    });
+    try {
+      const user = await this.userRepository.findOne({
+        where: { name: username },
+        select: ['id', 'email', 'phoneNumber', 'password', 'name'],
+      });
 
-    if (user && user.password === password) {
-      const { password, ...result } = user;
-      return {
-        access_token: this.jwtAuthentication.generateAccessToken(result),
-        refresh_token: this.jwtAuthentication.generateRefreshToken(result),
-      };
+      if (user && user.password === password) {
+        const { password, ...result } = user;
+        return {
+          access_token: this.jwtAuthentication.generateAccessToken(result),
+          refresh_token: this.jwtAuthentication.generateRefreshToken(result),
+        };
+      }
+      return null;
+    } catch (err) {
+      console.log(err);
     }
-
-    return null;
   }
   public async findOneById(id: number) {
     return this.userRepository.findOneBy({ id: id });
