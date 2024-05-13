@@ -123,11 +123,16 @@ export class NotificationService {
       where: {
         receiverId: id,
         deletedAt: null,
+        read: false,
       },
     });
     for (const notification of notifications) {
       notification.read = true;
       await this.notificationRepository.save(notification);
+      await this.userNotificationRepository.update(
+        { id: notification.id },
+        { read: true },
+      );
     }
     return notifications;
   }

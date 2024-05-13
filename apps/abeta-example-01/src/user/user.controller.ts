@@ -1,32 +1,29 @@
 
-import { Body, Controller, Post } from '@nestjs/common';
-import { UserService } from './user.service';
-import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';
-import { JwtAuthenticationService } from '@app/jwt-authentication';
+// import { Body, Controller, Post } from '@nestjs/common';
+// import { UserService } from './user.service';
+// import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';
+// import { JwtAuthenticationService } from '@app/jwt-authentication';
+//
+// class Payload {
+//   username: string;
+//   password: string;
+// }
+// @Controller('user')
+// export class UserController {
+//   constructor(
+//     private userService: UserService,
+//     private jwtAuthenticate: JwtAuthenticationService,
+//   ) {}
+//
+//   @Public()
+//   @Post('/signin')
+//   async signIn(@Body() payload: Payload) {
+//     return this.userService.validateUser(payload.username, payload.password);
+//   }
+// }
 
-class Payload {
-  username: string;
-  password: string;
-}
-@Controller('user')
-export class UserController {
-  constructor(
-    private userService: UserService,
-    private jwtAuthenticate: JwtAuthenticationService,
-  ) {}
 
-  @Public()
-  @Post('/signin')
-  async signIn(@Body() payload: Payload) {
-    return this.userService.validateUser(payload.username, payload.password);
-  }
-}
 
-/*
-{
-  "name":"tester1",
-  "password":"12345"
-=======
 import {
   Body,
   Controller,
@@ -46,6 +43,7 @@ import {
   FileFieldsInterceptor,
   FileInterceptor,
 } from '@nestjs/platform-express';
+import { AuthUser } from "../auth/decorators/user.decorator";
 
 @ApiBearerAuth()
 @Controller('user')
@@ -83,12 +81,12 @@ export class UserController {
     },
   })
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const imageUrl = await this.userService.uploadImage(file);
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @AuthUser() {id}) {
+    const imageUrl = await this.userService.uploadImage(file, id);
     return {
       url: imageUrl,
     };
   }
 
 }
-*/
+

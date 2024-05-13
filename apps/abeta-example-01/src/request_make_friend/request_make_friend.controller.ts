@@ -12,13 +12,14 @@ import {
 import { RequestMakeFriendService } from './request_make_friend.service';
 import { CreateRequestMakeFriendDto } from './dto/create-request_make_friend.dto';
 import { UpdateRequestMakeFriendDto } from './dto/update-request_make_friend.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiProperty, ApiTags } from "@nestjs/swagger";
 import { User } from '@app/jwt-authentication/user.decorator';
 import { LiteralObject } from '@nestjs/common/cache';
 class BodyObj {
   receiverId: number;
   status: boolean;
 }
+@ApiTags('Friends')
 @Controller('request-make-friend')
 export class RequestMakeFriendController {
   constructor(
