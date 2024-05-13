@@ -55,7 +55,7 @@ import { NotificationModule } from './notification/notification.module';
     UserModule,
 
     PostModule,
-    ExceptionFilterModule,
+    // ExceptionFilterModule,
     RequestMakeFriendModule,
 
     NodeMailerModule,

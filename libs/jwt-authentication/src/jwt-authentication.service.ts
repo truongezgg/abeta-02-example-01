@@ -25,8 +25,8 @@ export class JwtAuthenticationService {
         algorithms: ['HS256'],
       });
 
-      Object.assign(request, { user: decoded });
-      request['user'] = decoded;
+      Object.assign(request, { payload: decoded });
+      // request['user'] = decoded;
       return true;
     } catch (error) {
       throw new Unauthorized(
