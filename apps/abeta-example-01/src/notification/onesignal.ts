@@ -22,6 +22,7 @@ export class OneSignal {
   }
 
   async pushNotification(
+    // playerIds: string[],
     title: string,
     content: string,
   ): Promise<{ msg: string }> {
@@ -33,7 +34,10 @@ export class OneSignal {
         en: content,
       },
       included_segments: [process.env.ONESIGNAL_INCLUDED_SEGMENTS],
+      // include_player_ids: playerIds,
     };
+
+    console.log(notification);
 
     try {
       await this.client.createNotification(notification);

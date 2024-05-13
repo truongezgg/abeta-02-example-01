@@ -1,6 +1,5 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { Auth } from '../auth/decorators/auth.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from '../auth/decorators/user.decorator';
 import { LikeCommentService } from './likeComment.sevice';
 import { LikeCommentDto } from './dto/likeComment.dto';
@@ -8,7 +7,7 @@ import { UserLikeCommentDto } from './dto/userLikeComment.dto';
 
 @ApiTags('like comment')
 @Controller('comment/like')
-@Auth()
+@ApiBearerAuth()
 export class LikeCommentController {
   constructor(private readonly likeCommentService: LikeCommentService) {}
 

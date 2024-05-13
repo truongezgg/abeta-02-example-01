@@ -31,7 +31,7 @@ import { NotificationModule } from './notification/notification.module';
       isGlobal: true,
       load: [() => config],
       cache: true,
-      // validate: validateConfig,
+      validate: validateConfig,
     }),
     JwtAuthenticationModule.registerAsync({
       imports: [ConfigModule],
@@ -50,15 +50,15 @@ import { NotificationModule } from './notification/notification.module';
       },
       inject: [ConfigService],
     }),
-    CommentModule,
     AuthModule,
     UserModule,
-
+    
     PostModule,
     // ExceptionFilterModule,
     RequestMakeFriendModule,
-
+    
     NodeMailerModule,
+    CommentModule,
     LikeCommentModule,
     LikePostModule,
     NotificationModule,
