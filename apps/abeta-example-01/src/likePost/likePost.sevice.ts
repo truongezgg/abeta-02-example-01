@@ -7,6 +7,7 @@ import { Exception } from '@app/core/exception';
 import { CommonStatus, ErrorCode } from '@app/core/constants/enum';
 import { assignPaging, returnPaging } from '@app/helpers/utils';
 import { LikedPost } from '@app/database-type-orm/entities/LikedPost.entity';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class LikePostService {
@@ -17,6 +18,7 @@ export class LikePostService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(LikedPost)
     private readonly likedPostRepository: Repository<LikedPost>,
+    private notificationService: NotificationService,
   ) {}
 
   async postLike(userId, postId) {
@@ -60,6 +62,11 @@ export class LikePostService {
       };
 
       await this.likedPostRepository.save(like_post);
+      this.notificationService.create(userId, {
+        title: 'Facebook',
+        content: `${user.name} đã like bài viết của bạn`,
+        receiverId: post.userId,
+      });
       throw new Exception('', '', HttpStatus.OK, 'Liked the post successfully');
     }
 
@@ -79,6 +86,11 @@ export class LikePostService {
     if (likedPost.status === CommonStatus.INACTIVE) {
       await this.likedPostRepository.update(likedPost.id, {
         status: CommonStatus.ACTIVE,
+      });
+      this.notificationService.create(userId, {
+        title: 'Facebook',
+        content: `${user.name} đã like bài viết của bạn`,
+        receiverId: post.userId,
       });
       throw new Exception('', '', HttpStatus.OK, 'Liked the post successfully');
     }

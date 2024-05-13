@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommentModule } from './comment/comment.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSource } from '@app/database-type-orm/data-source';
-import config, { IConfig, IConfigAuth, validateConfig } from './config';
+import config, { IConfig, IConfigAuth } from './config';
 import {
   JwtAuthenticationGuard,
   JwtAuthenticationModule,
@@ -24,6 +24,9 @@ import { NodeMailerModule } from '@app/node-mailer';
 import { LikeCommentModule } from './likeComment/likeComment.module';
 import { LikePostModule } from './likePost/likePost.module';
 import { NotificationModule } from './notification/notification.module';
+import { UploadFileModule } from './upload-file/upload-file.module';
+import { ImageModule } from './image/image.module';
+import { PostImageModule } from './post-image/post-image.module';
 
 @Module({
   imports: [
@@ -31,7 +34,7 @@ import { NotificationModule } from './notification/notification.module';
       isGlobal: true,
       load: [() => config],
       cache: true,
-      // validate: validateConfig,
+      validate: validateConfig,
     }),
     JwtAuthenticationModule.registerAsync({
       imports: [ConfigModule],
@@ -50,18 +53,21 @@ import { NotificationModule } from './notification/notification.module';
       },
       inject: [ConfigService],
     }),
-    CommentModule,
     AuthModule,
     UserModule,
-
+    
     PostModule,
-    ExceptionFilterModule,
+    // ExceptionFilterModule,
     RequestMakeFriendModule,
-
+    
     NodeMailerModule,
+    CommentModule,
     LikeCommentModule,
     LikePostModule,
     NotificationModule,
+    UploadFileModule,
+    ImageModule,
+    PostImageModule,
   ],
   controllers: [AppController],
   providers: [
