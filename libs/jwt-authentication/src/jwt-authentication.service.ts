@@ -26,7 +26,6 @@ export class JwtAuthenticationService {
       });
 
       Object.assign(request, { payload: decoded });
-      // request['user'] = decoded;
       return true;
     } catch (error) {
       throw new Unauthorized(

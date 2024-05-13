@@ -12,6 +12,7 @@ import { CommonStatus, ErrorCode } from '@app/core/constants/enum';
 import { v2 as cloudinary } from 'cloudinary';
 import { assignPaging, returnPaging } from '@app/helpers/utils';
 import CommentImage from '@app/database-type-orm/entities/CommentImage.entity';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class CommentService {
@@ -24,6 +25,7 @@ export class CommentService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(CommentImage)
     private readonly commentImageRepository: Repository<CommentImage>,
+    private notificationService: NotificationService,
   ) {
     cloudinary.config({
       cloud_name: process.env.CLOUD_NAME,
@@ -76,6 +78,12 @@ export class CommentService {
       };
       await this.commentImageRepository.save(imageCmt);
     }
+
+    this.notificationService.create(userId, {
+      title: 'Facebook',
+      content: `${user.name} đã bình luận bài viết của bạn`,
+      receiverId: post.userId,
+    });
 
     return {
       ...comment,
@@ -149,6 +157,8 @@ export class CommentService {
     } else {
       throw new Exception(ErrorCode.Comment_Not_Found);
     }
+
+    comment.content = updateCommentDto.content;
 
     const image_comment = await this.commentImageRepository.findOne({
       where: {
