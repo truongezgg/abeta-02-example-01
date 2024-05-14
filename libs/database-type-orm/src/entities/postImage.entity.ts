@@ -16,10 +16,19 @@ export class PostImage {
   id: number;
 
   @Column({ name: 'post_id', type: 'bigint', unsigned: true })
-  postId: string;
+  postId: number;
 
   @Column({ name: 'url', type: 'varchar', length: 255 })
   url: string;
+
+  @Column({
+    name: 'status',
+    type: 'int',
+    unsigned: true,
+    default: 1,
+    comment: '1: active, 0: not active',
+  })
+  status: number;
 
   @ManyToOne(() => Post, (post) => post.image)
   @JoinColumn({ name: 'post_id' })

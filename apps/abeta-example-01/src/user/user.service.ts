@@ -44,20 +44,23 @@ export class UserService {
   }
 
   public async validateUser(username: string, password: string) {
-    const user = await this.userRepository.findOne({
-      where: { name: username },
-      select: ['id', 'email', 'phoneNumber', 'password', 'name'],
-    });
+    try {
+      const user = await this.userRepository.findOne({
+        where: { name: username },
+        select: ['id', 'email', 'phoneNumber', 'password', 'name'],
+      });
 
-    if (user && user.password === password) {
-      const { password, ...result } = user;
-      return {
-        access_token: this.jwtAuthentication.generateAccessToken(result),
-        refresh_token: this.jwtAuthentication.generateRefreshToken(result),
-      };
+      if (user && user.password === password) {
+        const { password, ...result } = user;
+        return {
+          access_token: this.jwtAuthentication.generateAccessToken(result),
+          refresh_token: this.jwtAuthentication.generateRefreshToken(result),
+        };
+      }
+      return null;
+    } catch (err) {
+      console.log(err);
     }
-
-    return null;
   }
   public async findOneById(id: number) {
     return this.userRepository.findOneBy({ id: id });
@@ -70,16 +73,64 @@ export class UserService {
     );
   }
 
-  async uploadImage(file, id: number) {
+  async uploadImages(files: any[], id: number) {
+    const storage = this.firebaseService.getStorageInstance();
+    const bucket = storage.bucket();
+
+    const uploadPromises = files.map(async (file) => {
+      const fileName = `${Date.now()}_${file.originalname}`;
+      const fileUpload = bucket.file(fileName);
+      const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${fileName}?alt=media`;
+      await this.imageRepository.save({
+        url: imageUrl,
+        userId: id,
+        image_type: 2,
+      });
+
+      const stream = fileUpload.createWriteStream({
+        metadata: {
+          contentType: file.mimeType,
+        },
+      });
+
+      return new Promise<string>((resolve, reject) => {
+        stream.on('error', (err) => {
+          reject(err);
+        });
+        stream.on('finish', () => {
+          resolve(imageUrl);
+        });
+        stream.end(file.buffer);
+      });
+    });
+
+    return Promise.all(uploadPromises);
+  }
+
+  async uploadAvatar(file, id: number) {
     const storage = this.firebaseService.getStorageInstance();
     const bucket = storage.bucket();
     const fileName = `${Date.now()}_${file.originalname}`;
     const fileUpload = bucket.file(fileName);
     const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${fileName}?alt=media`;
+    const oldAvatar = await this.imageRepository.findOne({
+      where: {
+        userId: id,
+        image_type: 1,
+        isAvatar: true,
+      },
+    });
+    if (oldAvatar) {
+      await this.imageRepository.update(
+        { id: oldAvatar.id },
+        { isAvatar: false },
+      );
+    }
     await this.imageRepository.save({
       url: imageUrl,
       userId: id,
       image_type: 1,
+      isAvatar: true,
     });
     const stream = fileUpload.createWriteStream({
       metadata: {
