@@ -16,6 +16,7 @@ import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { NodeMailerService } from '@app/node-mailer';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { Cron } from '@nestjs/schedule';
+import { SendgridService } from '@app/sendgrid';
 require('dotenv').config();
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
     private jwtAuthService: JwtAuthenticationService,
     private userService: UserService,
     private mailService: NodeMailerService,
+    private sendGridService: SendgridService,
   ) {}
 
   public async register(registerDto: RegisterAuthDto) {
@@ -102,10 +104,10 @@ export class AuthService {
       user_id: existedUser.id,
       isExpired: false,
     });
-    await this.mailService.send(
+    await this.sendGridService.sendMail(
       existedUser.email,
       'Reset Your Password',
-      './reset-password',
+      'reset-password',
       { otp },
     );
     return {
@@ -228,7 +230,7 @@ export class AuthService {
       },
     });
     for (const user of users) {
-      await this.mailService.send(
+      await this.sendGridService.sendMail(
         user.email,
         'Under Maintenance',
         './maintenance',

@@ -112,7 +112,8 @@
       "^@app/jwt-authentication(|/.*)$": "<rootDir>/libs/jwt-authentication/src/$1",
       "^@app/exception-filter(|/.*)$": "<rootDir>/libs/exception-filter/src/$1",
       "^@app/node-mailer(|/.*)$": "<rootDir>/libs/node-mailer/src/$1",
-      "^@app/s3-upload(|/.*)$": "<rootDir>/libs/s3-upload/src/$1"
+      "^@app/s3-upload(|/.*)$": "<rootDir>/libs/s3-upload/src/$1",
+      "^@app/sendgrid(|/.*)$": "<rootDir>/libs/sendgrid/src/$1"
     }
   }
 }

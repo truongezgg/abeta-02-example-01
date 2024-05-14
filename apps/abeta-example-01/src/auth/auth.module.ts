@@ -6,7 +6,6 @@ import User from '@app/database-type-orm/entities/User';
 import { UserModule } from '../user/user.module';
 import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
 import { NodeMailerModule } from '@app/node-mailer';
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, EmailOtp]),

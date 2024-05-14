@@ -53,7 +53,6 @@
         "tsConfigPath": "libs/jwt-authentication/tsconfig.lib.json"
       }
     },
-
     "exception-filter": {
       "type": "library",
       "root": "libs/exception-filter",
@@ -71,16 +70,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/node-mailer/tsconfig.lib.json"
       }
-    }
     },
-    "s3-upload": {
+    "sendgrid": {
       "type": "library",
-      "root": "libs/s3-upload",
+      "root": "libs/sendgrid",
       "entryFile": "index",
-      "sourceRoot": "libs/s3-upload/src",
+      "sourceRoot": "libs/sendgrid/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/s3-upload/tsconfig.lib.json"
-
+        "tsConfigPath": "libs/sendgrid/tsconfig.lib.json"
       }
     }
+  },
+  "s3-upload": {
+    "type": "library",
+    "root": "libs/s3-upload",
+    "entryFile": "index",
+    "sourceRoot": "libs/s3-upload/src",
+    "compilerOptions": {
+      "tsConfigPath": "libs/s3-upload/tsconfig.lib.json"
+    }
+  }
 }
