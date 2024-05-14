@@ -71,6 +71,7 @@
         "tsConfigPath": "libs/node-mailer/tsconfig.lib.json"
       }
     },
+
     "sendgrid": {
       "type": "library",
       "root": "libs/sendgrid",
@@ -78,6 +79,15 @@
       "sourceRoot": "libs/sendgrid/src",
       "compilerOptions": {
         "tsConfigPath": "libs/sendgrid/tsconfig.lib.json"
+      }
+    },
+    "firebase-storage": {
+      "type": "library",
+      "root": "libs/firebase-storage",
+      "entryFile": "index",
+      "sourceRoot": "libs/firebase-storage/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/firebase-storage/tsconfig.lib.json"
       }
     }
   },

@@ -30,6 +30,10 @@ import { LikePostModule } from './likePost/likePost.module';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SendgridModule } from '@app/sendgrid';
+import { SubscribeModule } from './subscribe/subscribe.module';
+import { UploadFileModule } from './upload-file/upload-file.module';
+import { ImageModule } from './image/image.module';
+import { PostImageModule } from './post-image/post-image.module';
 
 @Module({
   imports: [
@@ -69,11 +73,15 @@ import { SendgridModule } from '@app/sendgrid';
     PostModule,
     // ExceptionFilterModule,
     RequestMakeFriendModule,
+    SubscribeModule,
     NodeMailerModule,
     CommentModule,
     LikeCommentModule,
     LikePostModule,
     NotificationModule,
+    UploadFileModule,
+    ImageModule,
+    PostImageModule,
   ],
   controllers: [AppController],
   providers: [
