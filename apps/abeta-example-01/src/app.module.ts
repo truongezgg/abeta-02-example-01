@@ -25,6 +25,9 @@ import { LikeCommentModule } from './likeComment/likeComment.module';
 import { LikePostModule } from './likePost/likePost.module';
 import { NotificationModule } from './notification/notification.module';
 import { SubscribeModule } from './subscribe/subscribe.module';
+import { UploadFileModule } from './upload-file/upload-file.module';
+import { ImageModule } from './image/image.module';
+import { PostImageModule } from './post-image/post-image.module';
 
 @Module({
   imports: [
@@ -63,6 +66,9 @@ import { SubscribeModule } from './subscribe/subscribe.module';
     LikeCommentModule,
     LikePostModule,
     NotificationModule,
+    UploadFileModule,
+    ImageModule,
+    PostImageModule,
   ],
   controllers: [AppController],
   providers: [
