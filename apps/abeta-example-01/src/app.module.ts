@@ -24,6 +24,7 @@ import { NodeMailerModule } from '@app/node-mailer';
 import { LikeCommentModule } from './likeComment/likeComment.module';
 import { LikePostModule } from './likePost/likePost.module';
 import { NotificationModule } from './notification/notification.module';
+import { SubscribeModule } from './subscribe/subscribe.module';
 
 @Module({
   imports: [
@@ -56,7 +57,7 @@ import { NotificationModule } from './notification/notification.module';
     PostModule,
     // ExceptionFilterModule,
     RequestMakeFriendModule,
-    
+    SubscribeModule,
     NodeMailerModule,
     CommentModule,
     LikeCommentModule,
