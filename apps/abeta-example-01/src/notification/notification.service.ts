@@ -45,6 +45,7 @@ export class NotificationService {
     });
 
     const msg = await this.oneSignal.pushNotification(
+      [receiver.subscriptionId],
       newNotification.title,
       newNotification.content,
     );

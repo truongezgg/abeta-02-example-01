@@ -73,13 +73,13 @@ export class PostImageController {
     return this.postImageService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePostImageDto: UpdatePostImageDto,
-  ) {
-    return this.postImageService.update(+id, updatePostImageDto);
-  }
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updatePostImageDto: UpdatePostImageDto,
+  // ) {
+  //   return this.postImageService.update(+id, updatePostImageDto);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

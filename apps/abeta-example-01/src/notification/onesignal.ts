@@ -22,7 +22,7 @@ export class OneSignal {
   }
 
   async pushNotification(
-    // playerIds: string[],
+    playerIds: string[],
     title: string,
     content: string,
   ): Promise<{ msg: string }> {
@@ -33,8 +33,8 @@ export class OneSignal {
       contents: {
         en: content,
       },
-      included_segments: [process.env.ONESIGNAL_INCLUDED_SEGMENTS],
-      // include_player_ids: playerIds,
+      // included_segments: [process.env.ONESIGNAL_INCLUDED_SEGMENTS],
+      include_player_ids: playerIds,
     };
 
     console.log(notification);
