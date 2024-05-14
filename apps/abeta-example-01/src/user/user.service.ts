@@ -10,12 +10,15 @@ import { JwtAuthenticationService } from '@app/jwt-authentication';
 import { access } from 'fs';
 import { PassportSerializer } from '@nestjs/passport';
 import { FirebaseService } from './firebase.service';
+import UserImage from "@app/database-type-orm/entities/UserImage.entity";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(UserImage)
+    private imageRepository: Repository<UserImage>,
     private jwtAuthentication: JwtAuthenticationService,
     private firebaseService: FirebaseService,
   ) {}
@@ -65,11 +68,65 @@ export class UserService {
     );
   }
 
-  async uploadImage(file) {
+  async uploadImages(files: any[], id: number) {
+    const storage = this.firebaseService.getStorageInstance();
+    const bucket = storage.bucket();
+
+    const uploadPromises = files.map(async (file) => {
+      const fileName = `${Date.now()}_${file.originalname}`;
+      const fileUpload = bucket.file(fileName);
+      const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${fileName}?alt=media`;
+      await this.imageRepository.save({
+        url: imageUrl,
+        userId: id,
+        image_type: 2,
+      });
+
+      const stream = fileUpload.createWriteStream({
+        metadata: {
+          contentType: file.mimeType,
+        },
+      });
+
+      return new Promise<string>((resolve, reject) => {
+        stream.on('error', (err) => {
+          reject(err);
+        });
+        stream.on('finish', () => {
+          resolve(imageUrl);
+        });
+        stream.end(file.buffer);
+      });
+    });
+
+    return Promise.all(uploadPromises);
+  }
+
+  async uploadAvatar(file, id: number) {
     const storage = this.firebaseService.getStorageInstance();
     const bucket = storage.bucket();
     const fileName = `${Date.now()}_${file.originalname}`;
     const fileUpload = bucket.file(fileName);
+    const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${fileName}?alt=media`;
+    const oldAvatar = await this.imageRepository.findOne({
+      where: {
+        userId: id,
+        image_type: 1,
+        isAvatar: true,
+      },
+    });
+    if (oldAvatar) {
+      await this.imageRepository.update(
+        { id: oldAvatar.id },
+        { isAvatar: false },
+      );
+    }
+    await this.imageRepository.save({
+      url: imageUrl,
+      userId: id,
+      image_type: 1,
+      isAvatar: true,
+    });
     const stream = fileUpload.createWriteStream({
       metadata: {
         contentType: file.mimeType,
@@ -80,7 +137,6 @@ export class UserService {
         reject(err);
       });
       stream.on('finish', () => {
-        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${fileName}`;
         resolve(imageUrl);
       });
       stream.end(file.buffer);
