@@ -15,6 +15,8 @@ import { addMinutes, isAfter } from 'date-fns';
 import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { NodeMailerService } from '@app/node-mailer';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
+import { Cron } from '@nestjs/schedule';
+import { SendgridService } from '@app/sendgrid';
 require('dotenv').config();
 @Injectable()
 export class AuthService {
@@ -26,6 +28,7 @@ export class AuthService {
     private jwtAuthService: JwtAuthenticationService,
     private userService: UserService,
     private mailService: NodeMailerService,
+    private sendGridService: SendgridService,
   ) {}
 
   public async register(registerDto: RegisterAuthDto) {
@@ -101,10 +104,10 @@ export class AuthService {
       user_id: existedUser.id,
       isExpired: false,
     });
-    await this.mailService.send(
+    await this.sendGridService.sendMail(
       existedUser.email,
       'Reset Your Password',
-      './reset-password',
+      'reset-password',
       { otp },
     );
     return {
@@ -167,10 +170,7 @@ export class AuthService {
       changeDto.newPassword,
       parseInt(process.env.BCRYPT_HASH_ROUND),
     );
-    await this.userRepository.update(
-      { id: id },
-      { password: hashedPassword },
-    );
+    await this.userRepository.update({ id: id }, { password: hashedPassword });
     return {
       message: 'Reset Password Successfully',
     };
@@ -220,5 +220,21 @@ export class AuthService {
       accessToken: accessToken,
       refreshToken: refreshToken,
     };
+  }
+
+  @Cron('0 20 * * *')
+  async sendMailMaintenance() {
+    const users = await this.userRepository.find({
+      where: {
+        deletedAt: null,
+      },
+    });
+    for (const user of users) {
+      await this.sendGridService.sendMail(
+        user.email,
+        'Under Maintenance',
+        './maintenance',
+      );
+    }
   }
 }
