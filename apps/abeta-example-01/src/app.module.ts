@@ -24,6 +24,7 @@ import { NodeMailerModule } from '@app/node-mailer';
 import { LikeCommentModule } from './likeComment/likeComment.module';
 import { LikePostModule } from './likePost/likePost.module';
 import { NotificationModule } from './notification/notification.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { NotificationModule } from './notification/notification.module';
       isGlobal: true,
       load: [() => config],
       cache: true,
-      // validate: validateConfig,
+      validate: validateConfig,
     }),
     JwtAuthenticationModule.registerAsync({
       imports: [ConfigModule],
@@ -50,15 +51,14 @@ import { NotificationModule } from './notification/notification.module';
       },
       inject: [ConfigService],
     }),
-    CommentModule,
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
-
     PostModule,
     // ExceptionFilterModule,
     RequestMakeFriendModule,
-
     NodeMailerModule,
+    CommentModule,
     LikeCommentModule,
     LikePostModule,
     NotificationModule,

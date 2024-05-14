@@ -5,9 +5,13 @@ import User from '@app/database-type-orm/entities/User';
 import { LikeCommentController } from './likeComment.controller';
 import { LikeCommentService } from './likeComment.sevice';
 import LikeComment from '@app/database-type-orm/entities/likeComment.entity';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Comment, LikeComment])],
+  imports: [
+    TypeOrmModule.forFeature([User, Comment, LikeComment]),
+    NotificationModule,
+  ],
   controllers: [LikeCommentController],
   providers: [LikeCommentService],
 })

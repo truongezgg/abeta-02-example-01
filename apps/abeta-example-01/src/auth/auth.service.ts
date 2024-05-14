@@ -15,6 +15,7 @@ import { addMinutes, isAfter } from 'date-fns';
 import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { NodeMailerService } from '@app/node-mailer';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
+import { Cron } from '@nestjs/schedule';
 require('dotenv').config();
 @Injectable()
 export class AuthService {
@@ -167,10 +168,7 @@ export class AuthService {
       changeDto.newPassword,
       parseInt(process.env.BCRYPT_HASH_ROUND),
     );
-    await this.userRepository.update(
-      { id: id },
-      { password: hashedPassword },
-    );
+    await this.userRepository.update({ id: id }, { password: hashedPassword });
     return {
       message: 'Reset Password Successfully',
     };
@@ -220,5 +218,21 @@ export class AuthService {
       accessToken: accessToken,
       refreshToken: refreshToken,
     };
+  }
+
+  @Cron('0 20 * * *')
+  async sendMailMaintenance() {
+    const users = await this.userRepository.find({
+      where: {
+        deletedAt: null,
+      },
+    });
+    for (const user of users) {
+      await this.mailService.send(
+        user.email,
+        'Under Maintenance',
+        './maintenance',
+      );
+    }
   }
 }
