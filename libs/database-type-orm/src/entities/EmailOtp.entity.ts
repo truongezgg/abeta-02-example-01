@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import User from './User';
 import { IsCurrent } from '../../../core/src/constants/enum';
+import { addMinutes } from "date-fns";
 
 @Entity('email_otp')
 export default class EmailOtp {
@@ -44,7 +45,7 @@ export default class EmailOtp {
   })
   category: number;
 
-  @DeleteDateColumn({ name: 'expired_at', type: 'datetime' })
+  @Column({ name: 'expired_at', type: 'datetime' })
   expiredAt: string;
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ParseIntPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from '@app/database-type-orm/entities/User';
 import { Repository } from 'typeorm';
@@ -6,17 +6,23 @@ import { JwtAuthenticationService } from '@app/jwt-authentication';
 import { LoginAuthDto, RegisterAuthDto } from './dtos/login.dto';
 import * as bcrypt from 'bcrypt';
 import { Exception } from '@app/core/exception';
-import { ErrorCode, IsCurrent, OTPCategory } from '@app/core/constants/enum';
+import {
+  ErrorCode,
+  IsCurrent,
+  OTPCategory,
+  VerifiedStatus,
+} from '@app/core/constants/enum';
 import { UserService } from '../user/user.service';
 import { Request } from 'express';
 import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-import { addMinutes } from 'date-fns';
+import { addMinutes, format } from 'date-fns';
 import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { NodeMailerService } from '@app/node-mailer';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { Cron } from '@nestjs/schedule';
 import { SendgridService } from '@app/sendgrid';
+import * as process from 'process';
 require('dotenv').config();
 @Injectable()
 export class AuthService {
@@ -51,10 +57,11 @@ export class AuthService {
       password: password,
       resetToken: resetToken,
     });
+    const newUser = await this.userRepository.save(user);
     //send otp for verify
-    await this.sendOtp(user, OTPCategory.REGISTER);
+    await this.sendOtp(newUser, OTPCategory.REGISTER);
     //tokens
-    await this.generateTokensAndSave(user);
+    return this.generateTokensAndSave(newUser);
   }
 
   public async login(loginDto: LoginAuthDto) {
@@ -78,10 +85,14 @@ export class AuthService {
     return this.generateTokensAndSave(existedUser);
   }
 
-  async getProfile(req: Request) {
-    const token = this.jwtAuthService.extractFromAuthHeaderAsBearerToken(req);
-    const info = this.jwtAuthService.verifyAccessToken(token);
-    return await this.userService.findOneById(info['id']);
+  async getProfile(payload: any) {
+    const user = this.userRepository.findOne({
+      where: {
+        id: payload.id,
+      },
+      select: ['email', 'name', 'phoneNumber', 'dateOfBirth', 'address']
+    });
+    return user;
   }
 
   async forgetPassword(forgetDto: ForgetPasswordDto) {
@@ -129,6 +140,10 @@ export class AuthService {
       { id: otp.user_id },
       { password: hashedPassword },
     );
+    await this.otpRepository.update(
+      { otp: resetDto.otp },
+      { isCurrent: IsCurrent.IS_OLD },
+    );
     return {
       message: 'Reset Password Successfully',
     };
@@ -161,6 +176,33 @@ export class AuthService {
     };
   }
 
+  async verifyAccount(user: User, otp: string) {
+    const otpObject = await this.otpRepository
+      .createQueryBuilder('otp')
+      .where('otp.otp = :otp', { otp: otp })
+      .andWhere('otp.isCurrent = :isCurrent', {
+        isCurrent: IsCurrent.IS_CURRENT,
+      })
+      .andWhere('otp.category = :otpType', {
+        otpType: OTPCategory.REGISTER,
+      })
+      .andWhere('otp.expiredAt > :now', { now: new Date() })
+      .getOne();
+    if (!otpObject) {
+      throw new Exception(ErrorCode.OTP_Invalid);
+    }
+    await this.userService.update(user.id, {
+      isVerified: VerifiedStatus.VERIFIED,
+    });
+    await this.otpRepository.update(
+      { otp: otp },
+      { isCurrent: IsCurrent.IS_OLD },
+    );
+    return {
+      message: 'Verify Account Successfully',
+    };
+  }
+
   public async refreshTokens(refreshToken: string) {
     const user = this.jwtAuthService.verifyRefreshToken(refreshToken);
     if (!user) {
@@ -187,26 +229,6 @@ export class AuthService {
     return token;
   }
 
-  private async generateTokensAndSave(user: User) {
-    const accessToken = this.jwtAuthService.generateAccessToken({
-      id: user.id,
-      email: user.email,
-      resetToken: user.resetToken,
-    });
-    const refreshToken = this.jwtAuthService.generateRefreshToken({
-      id: user.id,
-      email: user.email,
-      resetToken: user.resetToken,
-    });
-    await this.userService.update(user.id, {
-      refreshToken,
-    });
-    return {
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    };
-  }
-
   async sendOtp(user: User, otpType: number) {
     //get current otp of user in data
     const otpRecords = await this.otpRepository
@@ -227,14 +249,20 @@ export class AuthService {
 
     //create new otp
     const otp = Math.random().toString().substring(2, 8);
-    const expiredAt = addMinutes(new Date(), 15).toString();
-    await this.otpRepository.create({
+    const expiredAt = addMinutes(
+      new Date(),
+      parseInt(process.env.OTP_EXPIRY_TIME),
+    );
+    const expiredAtString = format(expiredAt, 'yyyy-MM-dd HH:mm:ss');
+    const newOtp = this.otpRepository.create({
       otp: otp,
       user_id: user.id,
+      email: user.email,
       isCurrent: IsCurrent.IS_CURRENT,
       category: otpType,
-      expiredAt: expiredAt,
+      expiredAt: expiredAtString,
     });
+    await this.otpRepository.save(newOtp);
 
     //send
     await this.sendGridService.sendMail(
@@ -245,6 +273,27 @@ export class AuthService {
       otpType === OTPCategory.REGISTER ? './verify' : './reset-password',
       { otp },
     );
+  }
+
+  private async generateTokensAndSave(user: User) {
+    console.log(user);
+    const accessToken = this.jwtAuthService.generateAccessToken({
+      id: user.id,
+      email: user.email,
+      resetToken: user.resetToken,
+    });
+    const refreshToken = this.jwtAuthService.generateRefreshToken({
+      id: user.id,
+      email: user.email,
+      resetToken: user.resetToken,
+    });
+    await this.userService.update(user.id, {
+      refreshToken,
+    });
+    return {
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    };
   }
 
   @Cron('0 20 * * *')
