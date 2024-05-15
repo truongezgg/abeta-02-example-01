@@ -9,4 +9,7 @@ export class CreateNotificationDto {
 
   @ApiProperty({ example: '2' })
   receiverId: number;
+
+  @ApiProperty({ example: '1' })
+  categoryId: number;
 }

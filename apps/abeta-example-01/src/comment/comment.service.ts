@@ -83,6 +83,7 @@ export class CommentService {
       title: 'Facebook',
       content: `${user.name} đã bình luận bài viết của bạn`,
       receiverId: post.userId,
+      categoryId: 1,
     });
 
     return {
