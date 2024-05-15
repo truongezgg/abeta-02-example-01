@@ -5,7 +5,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommentModule } from './comment/comment.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSource } from '@app/database-type-orm/data-source';
-import config, { IConfig, IConfigAuth, validateConfig } from './config';
+import config, {
+  IConfig,
+  IConfigAuth,
+  IConfigSendGrid,
+  validateConfig,
+} from './config';
 import {
   JwtAuthenticationGuard,
   JwtAuthenticationModule,
@@ -14,7 +19,6 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 
 import { PostModule } from './post/post.module';
-import { ExceptionFilterModule } from '@app/exception-filter';
 import { RequestMakeFriendModule } from './request_make_friend/request_make_friend.module';
 
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -22,8 +26,14 @@ import { AllExceptionsFilter } from '@app/core/filters/http-exception.filter';
 import { TransformResponseInterceptor } from '@app/core/interceptors/transform-res.interceptor';
 import { NodeMailerModule } from '@app/node-mailer';
 import { LikeCommentModule } from './likeComment/likeComment.module';
-import { NotificationModule } from "./notification/notification.module";
-
+import { LikePostModule } from './likePost/likePost.module';
+import { NotificationModule } from './notification/notification.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { SendgridModule } from '@app/sendgrid';
+import { SubscribeModule } from './subscribe/subscribe.module';
+import { UploadFileModule } from './upload-file/upload-file.module';
+import { ImageModule } from './image/image.module';
+import { PostImageModule } from './post-image/post-image.module';
 
 @Module({
   imports: [
@@ -50,18 +60,28 @@ import { NotificationModule } from "./notification/notification.module";
       },
       inject: [ConfigService],
     }),
-    CommentModule,
+    SendgridModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService<IConfig, true>) => ({
+        ...configService.get<IConfigSendGrid>('sendGrid'),
+      }),
+      inject: [ConfigService],
+    }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
-
     PostModule,
     // ExceptionFilterModule,
     RequestMakeFriendModule,
-
+    SubscribeModule,
     NodeMailerModule,
+    CommentModule,
     LikeCommentModule,
+    LikePostModule,
     NotificationModule,
-
+    UploadFileModule,
+    ImageModule,
+    PostImageModule,
   ],
   controllers: [AppController],
   providers: [

@@ -6,15 +6,17 @@ import { JwtAuthenticationService } from '@app/jwt-authentication';
 import { LoginAuthDto, RegisterAuthDto } from './dtos/login.dto';
 import * as bcrypt from 'bcrypt';
 import { Exception } from '@app/core/exception';
-import { ErrorCode } from '@app/core/constants/enum';
+import { ErrorCode, IsCurrent, OTPCategory } from '@app/core/constants/enum';
 import { UserService } from '../user/user.service';
 import { Request } from 'express';
 import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-import { addMinutes, isAfter } from 'date-fns';
+import { addMinutes } from 'date-fns';
 import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { NodeMailerService } from '@app/node-mailer';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
+import { Cron } from '@nestjs/schedule';
+import { SendgridService } from '@app/sendgrid';
 require('dotenv').config();
 @Injectable()
 export class AuthService {
@@ -26,28 +28,33 @@ export class AuthService {
     private jwtAuthService: JwtAuthenticationService,
     private userService: UserService,
     private mailService: NodeMailerService,
+    private sendGridService: SendgridService,
   ) {}
 
   public async register(registerDto: RegisterAuthDto) {
+    //check user existed or not
     const existedUser = await this.userRepository.findOneBy({
       email: registerDto.email,
     });
     if (existedUser) {
       throw new Exception(ErrorCode.Email_Already_Exist, 'Email already exist');
     }
+    //create new password and resetToken
     const password = bcrypt.hashSync(
       registerDto.password,
       bcrypt.genSaltSync(),
     );
     const resetToken = this.generateRandomResetToken();
-    const user = await this.userService.create({
+    //create user
+    const user = await this.userRepository.create({
       email: registerDto.email,
       password: password,
       resetToken: resetToken,
     });
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    return this.generateTokensAndSave(user);
+    //send otp for verify
+    await this.sendOtp(user, OTPCategory.REGISTER);
+    //tokens
+    await this.generateTokensAndSave(user);
   }
 
   public async login(loginDto: LoginAuthDto) {
@@ -78,6 +85,7 @@ export class AuthService {
   }
 
   async forgetPassword(forgetDto: ForgetPasswordDto) {
+    //check if user existed
     const existedUser = await this.userRepository.findOne({
       where: {
         email: forgetDto.email,
@@ -86,52 +94,32 @@ export class AuthService {
     if (!existedUser) {
       throw new Exception(ErrorCode.User_Not_Found, 'User Not Found');
     }
-    const otpRecords = await this.otpRepository.find({
-      where: {
-        user_id: existedUser.id,
-      },
-    });
-    for (const otpRecord of otpRecords) {
-      otpRecord.isExpired = true;
-      await this.otpRepository.save(otpRecord);
-    }
-    const otp = Math.random().toString(20).substring(2, 12);
-    await this.otpRepository.save({
-      otp: otp,
-      user_id: existedUser.id,
-      isExpired: false,
-    });
-    await this.mailService.send(
-      existedUser.email,
-      'Reset Your Password',
-      './reset-password',
-      { otp },
-    );
+    //send otp
+    await this.sendOtp(existedUser, OTPCategory.FORGET_PASSWORD);
     return {
       message: 'Check your email',
     };
   }
 
   async resetPassword(resetDto: ResetPasswordDto) {
-    const otp = await this.otpRepository.findOne({
-      where: {
-        otp: resetDto.otp,
-        isExpired: false,
-      },
-    });
+    //check otp
+    const otp = await this.otpRepository
+      .createQueryBuilder('otp')
+      .where('otp.otp = :otp', { otp: resetDto.otp })
+      .andWhere('otp.isCurrent = :isCurrent', {
+        isCurrent: IsCurrent.IS_CURRENT,
+      })
+      .andWhere('otp.category = :otpType', {
+        otpType: OTPCategory.FORGET_PASSWORD,
+      })
+      .andWhere('otp.expiredAt > :now', { now: new Date() })
+      .getOne();
     if (!otp) {
       throw new Exception(ErrorCode.OTP_Invalid);
     }
     const user = await this.userService.findOneById(otp.user_id);
     if (!user) {
       throw new Exception(ErrorCode.User_Not_Found);
-    }
-    const expiredTime = addMinutes(
-      otp.createdAt,
-      parseInt(process.env.OTP_EXPIRY_TIME),
-    );
-    if (isAfter(new Date(), expiredTime)) {
-      throw new Exception(ErrorCode.OTP_Expired);
     }
     const hashedPassword = await bcrypt.hash(
       resetDto.password,
@@ -167,10 +155,7 @@ export class AuthService {
       changeDto.newPassword,
       parseInt(process.env.BCRYPT_HASH_ROUND),
     );
-    await this.userRepository.update(
-      { id: id },
-      { password: hashedPassword },
-    );
+    await this.userRepository.update({ id: id }, { password: hashedPassword });
     return {
       message: 'Reset Password Successfully',
     };
@@ -220,5 +205,61 @@ export class AuthService {
       accessToken: accessToken,
       refreshToken: refreshToken,
     };
+  }
+
+  async sendOtp(user: User, otpType: number) {
+    //get current otp of user in data
+    const otpRecords = await this.otpRepository
+      .createQueryBuilder('otp')
+      .where('otp.user_id = :userId', { userId: user.id })
+      .andWhere('otp.isCurrent = :isCurrent', {
+        isCurrent: IsCurrent.IS_CURRENT,
+      })
+      .andWhere('otp.category = :otpType', { otpType: otpType })
+      .andWhere('otp.expiredAt > :now', { now: new Date() })
+      .getMany();
+
+    //change current status for that otp
+    for (const otpRecord of otpRecords) {
+      otpRecord.isCurrent = IsCurrent.IS_OLD;
+      await this.otpRepository.save(otpRecord);
+    }
+
+    //create new otp
+    const otp = Math.random().toString().substring(2, 8);
+    const expiredAt = addMinutes(new Date(), 15).toString();
+    await this.otpRepository.create({
+      otp: otp,
+      user_id: user.id,
+      isCurrent: IsCurrent.IS_CURRENT,
+      category: otpType,
+      expiredAt: expiredAt,
+    });
+
+    //send
+    await this.sendGridService.sendMail(
+      user.email,
+      otpType === OTPCategory.REGISTER
+        ? 'Verify Your Account'
+        : 'Reset Your Password',
+      otpType === OTPCategory.REGISTER ? './verify' : './reset-password',
+      { otp },
+    );
+  }
+
+  @Cron('0 20 * * *')
+  async sendMailMaintenance() {
+    const users = await this.userRepository.find({
+      where: {
+        deletedAt: null,
+      },
+    });
+    for (const user of users) {
+      await this.sendGridService.sendMail(
+        user.email,
+        'Under Maintenance',
+        './maintenance',
+      );
+    }
   }
 }

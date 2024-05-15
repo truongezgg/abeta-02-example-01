@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { Allow, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class UpdateCommentDto {
   @Type(() => Number)
@@ -11,4 +11,8 @@ export class UpdateCommentDto {
   @IsString()
   @IsNotEmpty()
   content: string;
+
+  @ApiProperty({ required: false, type: 'file' })
+  @Allow()
+  image: any;
 }

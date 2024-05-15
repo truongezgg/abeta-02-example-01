@@ -4,13 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import User from '@app/database-type-orm/entities/User';
 import { Repository } from 'typeorm';
 import { Exception } from '@app/core/exception';
-import { ErrorCode } from '@app/core/constants/enum';
-
+import { ErrorCode, IsCurrent } from '@app/core/constants/enum';
 import { JwtAuthenticationService } from '@app/jwt-authentication';
-import { access } from 'fs';
-import { PassportSerializer } from '@nestjs/passport';
+
+// import { access } from 'fs';
+// import { PassportSerializer } from '@nestjs/passport';
+
 import { FirebaseService } from './firebase.service';
-import UserImage from "@app/database-type-orm/entities/UserImage.entity";
+import UserImage from '@app/database-type-orm/entities/UserImage.entity';
 
 @Injectable()
 export class UserService {
@@ -42,20 +43,23 @@ export class UserService {
   }
 
   public async validateUser(username: string, password: string) {
-    const user = await this.userRepository.findOne({
-      where: { name: username },
-      select: ['id', 'email', 'phoneNumber', 'password', 'name'],
-    });
+    try {
+      const user = await this.userRepository.findOne({
+        where: { name: username },
+        select: ['id', 'email', 'phoneNumber', 'password', 'name'],
+      });
 
-    if (user && user.password === password) {
-      const { password, ...result } = user;
-      return {
-        access_token: this.jwtAuthentication.generateAccessToken(result),
-        refresh_token: this.jwtAuthentication.generateRefreshToken(result),
-      };
+      if (user && user.password === password) {
+        const { password, ...result } = user;
+        return {
+          access_token: this.jwtAuthentication.generateAccessToken(result),
+          refresh_token: this.jwtAuthentication.generateRefreshToken(result),
+        };
+      }
+      return null;
+    } catch (err) {
+      console.log(err);
     }
-
-    return null;
   }
   public async findOneById(id: number) {
     return this.userRepository.findOneBy({ id: id });
@@ -112,13 +116,13 @@ export class UserService {
       where: {
         userId: id,
         image_type: 1,
-        isAvatar: true,
+        isCurrentAvatar: IsCurrent.IS_CURRENT,
       },
     });
     if (oldAvatar) {
       await this.imageRepository.update(
         { id: oldAvatar.id },
-        { isAvatar: false },
+        { isCurrentAvatar: IsCurrent.IS_OLD },
       );
     }
     await this.imageRepository.save({

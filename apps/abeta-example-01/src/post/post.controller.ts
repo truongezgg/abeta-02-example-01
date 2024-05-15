@@ -13,7 +13,7 @@ import {
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { User } from '@app/jwt-authentication/user.decorator';
 import { LiteralObject } from '@nestjs/common/cache';
 import { AuthUser } from '../auth/decorators/user.decorator';
@@ -22,6 +22,7 @@ class requestUser {
   id: number;
   name: string;
 }
+@ApiTags('Post')
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}

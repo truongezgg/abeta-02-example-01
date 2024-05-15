@@ -1,11 +1,11 @@
 import { Client } from 'onesignal-node';
-require('dotenv').config();
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IConfig } from '../config';
-import { OnesignalDto } from './dtos/onesignal.dto';
+// import { OnesignalDto } from './dtos/onesignal.dto';
 import { CreateNotificationBody } from 'onesignal-node/lib/types';
-import * as process from "process";
+import * as process from 'process';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
 @Injectable()
@@ -22,6 +22,7 @@ export class OneSignal {
   }
 
   async pushNotification(
+    playerIds: string[],
     title: string,
     content: string,
   ): Promise<{ msg: string }> {
@@ -32,8 +33,11 @@ export class OneSignal {
       contents: {
         en: content,
       },
-      included_segments: [process.env.ONESIGNAL_INCLUDED_SEGMENTS],
+      // included_segments: [process.env.ONESIGNAL_INCLUDED_SEGMENTS],
+      include_player_ids: playerIds,
     };
+
+    console.log(notification);
 
     try {
       await this.client.createNotification(notification);

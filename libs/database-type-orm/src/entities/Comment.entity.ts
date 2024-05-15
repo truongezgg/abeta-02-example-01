@@ -12,6 +12,7 @@ import {
 import LikeComment from './likeComment.entity';
 import User from './User';
 import { Post } from './Post.entity';
+import { CommonStatus } from '../../../core/src/constants/enum';
 
 @Entity('comment')
 export default class Comment {
@@ -41,6 +42,14 @@ export default class Comment {
 
   @OneToMany(() => LikeComment, (likeCmt) => likeCmt.comment)
   likeCmt: LikeComment[];
+
+  @Column({
+    name: 'status',
+    type: 'tinyint',
+    default: CommonStatus.ACTIVE,
+    unsigned: true,
+  })
+  status: number;
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

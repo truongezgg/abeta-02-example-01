@@ -1,10 +1,13 @@
 import {
-  Column, CreateDateColumn, DeleteDateColumn,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn, UpdateDateColumn
-} from "typeorm";
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import User from './User';
 import Notification from './Notification.entity';
 

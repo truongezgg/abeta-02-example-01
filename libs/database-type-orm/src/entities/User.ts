@@ -1,5 +1,5 @@
 import { Post } from './Post.entity';
-import { CommonStatus } from '../../../core/src/constants/enum';
+import { CommonStatus, VerifiedStatus } from '../../../core/src/constants/enum';
 import {
   Column,
   CreateDateColumn,
@@ -12,17 +12,12 @@ import {
 
 import Notification from './Notification.entity';
 import UserNotification from './UserNotification.entity';
-
 import { LikedPost } from './LikedPost.entity';
-
 import LikeComment from './likeComment.entity';
 import Comment from './Comment.entity';
 import UserImage from './UserImage.entity';
-
 import { RequestMakeFriend } from './ReuestMakeFriend.entity';
-
 import EmailOtp from './EmailOtp.entity';
-
 
 @Entity('user')
 export default class User {
@@ -60,6 +55,14 @@ export default class User {
   })
   status: number;
 
+  @Column({
+    name: 'is_verified',
+    type: 'tinyint',
+    default: VerifiedStatus.NOT_VERIFIED,
+    unsigned: true,
+  })
+  isVerified: number;
+
   @Column({ name: 'reset_token', type: 'varchar', length: 100, nullable: true })
   resetToken: string;
 
@@ -77,6 +80,14 @@ export default class User {
 
   @Column({ name: 'address', type: 'varchar', default: null })
   address: string;
+
+  @Column({
+    name: 'subscription_id',
+    type: 'varchar',
+    length: 100,
+    default: null,
+  })
+  subscriptionId: string;
 
   @OneToMany(() => Notification, (notifications) => notifications.userSend)
   notifications: Notification[];
@@ -102,7 +113,6 @@ export default class User {
   @OneToMany(() => Comment, (cmt) => cmt.user)
   comment: Comment[];
 
-
   @OneToMany(() => RequestMakeFriend, (req) => req.sender)
   requestSender: RequestMakeFriend[];
 
@@ -111,7 +121,6 @@ export default class User {
 
   @OneToMany(() => EmailOtp, (otps) => otps.user)
   otps: EmailOtp[];
-
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

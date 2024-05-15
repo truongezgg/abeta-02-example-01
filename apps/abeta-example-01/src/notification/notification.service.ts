@@ -9,8 +9,9 @@ import { UserService } from '../user/user.service';
 import { Exception } from '@app/core/exception';
 import { ErrorCode } from '@app/core/constants/enum';
 import User from '@app/database-type-orm/entities/User';
-import { UpdateNotificationDto } from './dtos/updateNotification.dto';
-import * as assert from 'assert';
+// import { UpdateNotificationDto } from './dtos/updateNotification.dto';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// import * as assert from 'assert';
 import { PagingDto } from './dtos/paging.dto';
 import { assignPaging, returnPaging } from '@app/helpers';
 
@@ -42,7 +43,9 @@ export class NotificationService {
       notificationId: newNotification.id,
       read: false,
     });
+
     const msg = await this.oneSignal.pushNotification(
+      [receiver.subscriptionId],
       newNotification.title,
       newNotification.content,
     );
@@ -122,11 +125,16 @@ export class NotificationService {
       where: {
         receiverId: id,
         deletedAt: null,
+        read: false,
       },
     });
     for (const notification of notifications) {
       notification.read = true;
       await this.notificationRepository.save(notification);
+      await this.userNotificationRepository.update(
+        { id: notification.id },
+        { read: true },
+      );
     }
     return notifications;
   }
