@@ -9,16 +9,16 @@ export class FirebaseService {
   private storage: firebase.storage.Storage;
 
   constructor() {
-    const serviceAccountPath = path.join(
-      __dirname,
-      '..',
-      'Key.json',
-    );
-    firebase.initializeApp({
-      credential: firebase.credential.cert(serviceAccountPath),
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    });
-    this.storage = firebase.storage();
+    // const serviceAccountPath = path.join(
+    //   __dirname,
+    //   '..',
+    //   'Key.json',
+    // );
+    // firebase.initializeApp({
+    //   credential: firebase.credential.cert(serviceAccountPath),
+    //   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    // });
+    // this.storage = firebase.storage();
   }
   getStorageInstance(): firebase.storage.Storage {
     return this.storage;
