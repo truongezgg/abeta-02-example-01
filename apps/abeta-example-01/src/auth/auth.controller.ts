@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Put, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { LoginAuthDto, RegisterAuthDto } from './dtos/login.dto';
 import { AuthService } from './auth.service';
@@ -9,6 +18,8 @@ import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { AuthUser } from './decorators/user.decorator';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
+import { OTPCategory } from "@app/core/constants/enum";
+import { VerifyDto } from "./dtos/verify.dto";
 
 @ApiBearerAuth()
 @ApiTags('Auth')
@@ -33,7 +44,7 @@ export class AuthController {
 
   @Get('profile')
   getProfile(@AuthUser() payload: any) {
-    return payload;
+    return this.authService.getProfile(payload);
   }
 
   @Public()
@@ -59,5 +70,15 @@ export class AuthController {
       .trim()
       .replace('Bearer ', '');
     return this.authService.refreshTokens(refreshToken);
+  }
+
+  @Post('verify')
+  verifyAccount(@AuthUser() user, verifyDto: VerifyDto) {
+    return this.authService.verifyAccount(user, verifyDto.otp);
+  }
+
+  @Post('send-mail-verify')
+  sendMailVerify(@AuthUser() user){
+    return this.authService.sendOtp(user, OTPCategory.REGISTER);
   }
 }
