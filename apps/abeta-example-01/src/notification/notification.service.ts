@@ -36,7 +36,7 @@ export class NotificationService {
       title: createDto.title,
       content: createDto.content,
       senderId: id,
-      categoryId: 3,
+      categoryId: createDto.categoryId,
     });
     const newUserNotification = await this.userNotificationRepository.save({
       receiverId: createDto.receiverId,
@@ -45,7 +45,7 @@ export class NotificationService {
     });
 
     const msg = await this.oneSignal.pushNotification(
-      [receiver.subscriptionId],
+      [receiver.id],
       newNotification.title,
       newNotification.content,
     );

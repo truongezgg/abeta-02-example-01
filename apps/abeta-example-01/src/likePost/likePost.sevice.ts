@@ -66,6 +66,7 @@ export class LikePostService {
         title: 'Facebook',
         content: `${user.name} đã like bài viết của bạn`,
         receiverId: post.userId,
+        categoryId: 2,
       });
       throw new Exception('', '', HttpStatus.OK, 'Liked the post successfully');
     }
@@ -91,6 +92,7 @@ export class LikePostService {
         title: 'Facebook',
         content: `${user.name} đã like bài viết của bạn`,
         receiverId: post.userId,
+        categoryId: 2,
       });
       throw new Exception('', '', HttpStatus.OK, 'Liked the post successfully');
     }

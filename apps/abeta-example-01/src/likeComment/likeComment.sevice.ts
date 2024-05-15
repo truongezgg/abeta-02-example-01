@@ -66,6 +66,7 @@ export class LikeCommentService {
         title: 'Facebook',
         content: `${user.name} đã like bình luận của bạn`,
         receiverId: comment.userId,
+        categoryId: 2,
       });
       throw new Exception(
         '',
@@ -96,6 +97,7 @@ export class LikeCommentService {
         title: 'Facebook',
         content: `${user.name} đã like bình luận của bạn`,
         receiverId: comment.userId,
+        categoryId: 2,
       });
       throw new Exception(
         '',
