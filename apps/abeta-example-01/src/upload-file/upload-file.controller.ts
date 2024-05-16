@@ -19,7 +19,7 @@ import { UpdateUploadFileDto } from './dto/update-upload-file.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';
 import { ImageService } from '../image/image.service';
-import { ApiBody, ApiConsumes } from "@nestjs/swagger";
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 @Controller('upload-file')
 export class UploadFileController {
@@ -51,7 +51,7 @@ export class UploadFileController {
     @UploadedFiles(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
-          fileType: 'image/jpeg',
+          fileType: 'image',
         })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
