@@ -77,14 +77,6 @@ export default class User {
   @Column({ name: 'address', type: 'varchar', default: null })
   address: string;
 
-  @Column({
-    name: 'subscription_id',
-    type: 'varchar',
-    length: 100,
-    default: null,
-  })
-  subscriptionId: string;
-
   @OneToMany(() => Notification, (notifications) => notifications.userSend)
   notifications: Notification[];
 

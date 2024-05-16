@@ -13,6 +13,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { assignPaging, returnPaging } from '@app/helpers/utils';
 import CommentImage from '@app/database-type-orm/entities/CommentImage.entity';
 import { NotificationService } from '../notification/notification.service';
+import UserImage from '@app/database-type-orm/entities/UserImage.entity';
 
 @Injectable()
 export class CommentService {
@@ -23,6 +24,8 @@ export class CommentService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    @InjectRepository(UserImage)
+    private readonly userImageRepository: Repository<UserImage>,
     @InjectRepository(CommentImage)
     private readonly commentImageRepository: Repository<CommentImage>,
     private notificationService: NotificationService,
@@ -87,21 +90,39 @@ export class CommentService {
     });
 
     return {
-      ...comment,
-      imageComment: imageComment,
+      success: true,
+      status: HttpStatus.CREATED,
+      message: 'OK',
+      payload: 'Create A Comment Successfully!',
     };
   }
 
   async findAll(commentDto: CommentDto) {
     const params = assignPaging(commentDto);
-    const comment = await this.commentRepository.find({
-      where: {
-        postId: commentDto.postId,
-        status: CommonStatus.ACTIVE,
-      },
-      relations: ['user', 'post'],
-      skip: params.skip,
-      take: params.pageSize,
+    const comments = await this.commentRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .leftJoinAndSelect('comment.post', 'post', 'post.status = :postStatus')
+      .where('comment.postId = :postId', { postId: commentDto.postId })
+      .andWhere('comment.status = :status', { status: CommonStatus.ACTIVE })
+      .andWhere('post.status = :postStatus', {
+        postStatus: CommonStatus.ACTIVE,
+      })
+      .select(['comment', 'user.id', 'user.name'])
+      .skip(params.skip)
+      .take(params.pageSize)
+      .getMany();
+
+    comments.forEach(async (cmt, i) => {
+      const userImage = await this.userImageRepository.findOne({
+        where: { userId: +cmt.userId, isAvatar: true },
+        select: ['url'],
+      });
+      const user = {
+        ...cmt.user,
+        avatar: userImage.url,
+      };
+      cmt.user = user;
     });
 
     const totalComments = await this.commentRepository.count({
@@ -111,26 +132,38 @@ export class CommentService {
       },
     });
 
-    const pagingResult = returnPaging(comment, totalComments, params);
-    return {
-      comments: pagingResult,
-    };
+    const pagingResult = returnPaging(comments, totalComments, params);
+    return pagingResult;
   }
 
   async findOne(commentId: number) {
-    const comment = await this.commentRepository.findOne({
-      where: {
-        id: commentId,
-        status: CommonStatus.ACTIVE,
-      },
-      relations: ['user', 'post'],
-    });
+    const comment = await this.commentRepository
+      .createQueryBuilder('comment')
+      .where('comment.id = :commentId', { commentId })
+      .leftJoinAndSelect('comment.user', 'user')
+      .leftJoinAndSelect('comment.post', 'post')
+      .andWhere('comment.status = :status', { status: CommonStatus.ACTIVE })
+      .andWhere('post.status = :postStatus', {
+        postStatus: CommonStatus.ACTIVE,
+      })
+      .select(['comment', 'user.id', 'user.name'])
+      .getOne();
     if (!comment) {
       throw new Exception(ErrorCode.Comment_Not_Found);
     }
-    return {
-      comment,
+
+    const userImage = await this.userImageRepository.findOne({
+      where: { userId: +comment.userId },
+      select: ['url'],
+    });
+
+    const user = {
+      ...comment.user,
+      avatar: userImage.url,
     };
+    comment.user = user;
+
+    return comment;
   }
 
   async update(
@@ -191,10 +224,11 @@ export class CommentService {
         });
       }
     }
-
     return {
-      ...comment,
-      imageComment: url,
+      success: true,
+      status: HttpStatus.CREATED,
+      message: 'OK',
+      payload: 'Update A Comment Successfully!',
     };
   }
 
@@ -213,12 +247,13 @@ export class CommentService {
         status: CommonStatus.INACTIVE,
         deletedAt: new Date().toISOString(),
       });
-      throw new Exception(
-        '',
-        '',
-        HttpStatus.OK,
-        'Remove a comment successfully',
-      );
+
+      return {
+        success: true,
+        status: HttpStatus.OK,
+        message: 'OK',
+        payload: 'Remove a comment successfully!',
+      };
     } else throw new Exception(ErrorCode.Comment_Not_Found);
   }
 }

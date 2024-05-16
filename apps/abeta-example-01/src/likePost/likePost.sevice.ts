@@ -8,6 +8,7 @@ import { CommonStatus, ErrorCode } from '@app/core/constants/enum';
 import { assignPaging, returnPaging } from '@app/helpers/utils';
 import { LikedPost } from '@app/database-type-orm/entities/LikedPost.entity';
 import { NotificationService } from '../notification/notification.service';
+import UserImage from '@app/database-type-orm/entities/UserImage.entity';
 
 @Injectable()
 export class LikePostService {
@@ -18,6 +19,8 @@ export class LikePostService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(LikedPost)
     private readonly likedPostRepository: Repository<LikedPost>,
+    @InjectRepository(UserImage)
+    private readonly userImageRepository: Repository<UserImage>,
     private notificationService: NotificationService,
   ) {}
 
@@ -68,7 +71,12 @@ export class LikePostService {
         receiverId: post.userId,
         categoryId: 2,
       });
-      throw new Exception('', '', HttpStatus.OK, 'Liked the post successfully');
+      return {
+        success: true,
+        status: HttpStatus.CREATED,
+        message: 'OK',
+        payload: 'Liked the post successfully',
+      };
     }
 
     if (likedPost.status === CommonStatus.ACTIVE) {
@@ -76,12 +84,12 @@ export class LikePostService {
         status: CommonStatus.INACTIVE,
         deletedAt: new Date().toISOString(),
       });
-      throw new Exception(
-        '',
-        '',
-        HttpStatus.OK,
-        'Remove liked the post successfully',
-      );
+      return {
+        success: true,
+        status: HttpStatus.CREATED,
+        message: 'OK',
+        payload: 'Remove liked the post successfully',
+      };
     }
 
     if (likedPost.status === CommonStatus.INACTIVE) {
@@ -94,40 +102,61 @@ export class LikePostService {
         receiverId: post.userId,
         categoryId: 2,
       });
-      throw new Exception('', '', HttpStatus.OK, 'Liked the post successfully');
+      return {
+        success: true,
+        status: HttpStatus.CREATED,
+        message: 'OK',
+        payload: 'Liked the post successfully',
+      };
     }
   }
 
   async findUsersLikePost(userLikePostDto) {
     const params = assignPaging(userLikePostDto);
 
-    const likePosts = await this.likedPostRepository.find({
+    const likePosts = await this.likedPostRepository
+      .createQueryBuilder('like_post')
+      .withDeleted()
+      .leftJoinAndSelect('like_post.user', 'user')
+      .leftJoinAndSelect('like_post.post', 'post')
+      .where('like_post.postId = :postId', {
+        postId: userLikePostDto.postId,
+      })
+      .andWhere('post.status = :postStatus', {
+        postStatus: CommonStatus.ACTIVE,
+      })
+      .andWhere('like_post.status = :like_postStatus', {
+        like_postStatus: CommonStatus.ACTIVE,
+      })
+      .select(['like_post', 'user.id', 'user.name'])
+      .skip(params.skip)
+      .take(params.pageSize)
+      .getMany();
+
+    console.log(likePosts);
+
+    likePosts.forEach(async (likePost, i) => {
+      const userImage = await this.userImageRepository.findOne({
+        where: { userId: +likePost.userId, isAvatar: true },
+        select: ['url'],
+      });
+      const user = {
+        ...likePost.user,
+        avatar: userImage.url,
+      };
+      likePost.user = user;
+    });
+
+    const totalLikeComments = await this.likedPostRepository.count({
       where: {
         postId: userLikePostDto.postId,
         status: CommonStatus.ACTIVE,
       },
-      relations: ['user'],
       withDeleted: true,
-      skip: params.skip,
-      take: params.pageSize,
     });
 
-    const totalLikePosts = await this.likedPostRepository.count({
-      where: {
-        postId: userLikePostDto.postId,
-        status: CommonStatus.ACTIVE,
-      },
-    });
+    const pagingResult = returnPaging(likePosts, totalLikeComments, params);
 
-    const pagingResult = returnPaging(likePosts, totalLikePosts, params);
-
-    return {
-      likesPost: pagingResult.data.map((like) => ({
-        id: String(like.id),
-        user: {
-          name: like.user.name,
-        },
-      })),
-    };
+    return pagingResult;
   }
 }
