@@ -19,6 +19,7 @@ import { UpdateUploadFileDto } from './dto/update-upload-file.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';
 import { ImageService } from '../image/image.service';
+import { ApiBody, ApiConsumes } from "@nestjs/swagger";
 
 @Controller('upload-file')
 export class UploadFileController {
@@ -29,6 +30,21 @@ export class UploadFileController {
 
   @Public()
   @Post('upload')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
   @UseInterceptors(FilesInterceptor('files'))
   async uploadFileAndPassValidation(
     @Body() body: FormData,

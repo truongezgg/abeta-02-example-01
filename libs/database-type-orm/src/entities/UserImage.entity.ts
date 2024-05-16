@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import User from './User';
+import { IsCurrent } from '../../../core/src/constants/enum';
 
 @Entity('user-image')
 export default class UserImage {
@@ -27,19 +28,18 @@ export default class UserImage {
 
   @Column({
     name: 'image_type',
-    type: 'int',
+    type: 'tinyint',
     unsigned: true,
-    comment: '1: profile image, 2: wall image',
+    comment: '0: profile picture, 1: cover picture',
   })
   image_type: number;
 
   @Column({
-    name: 'is_avatar',
-    type: 'boolean',
-    comment: 'true: is current avatar, false: old avatar',
-    default: false,
+    name: 'is_current_avatar',
+    type: 'tinyint',
+    default: IsCurrent.IS_CURRENT,
   })
-  isAvatar: boolean;
+  isCurrentAvatar: number;
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'datetime' })
   deletedAt: string;

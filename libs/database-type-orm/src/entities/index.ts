@@ -25,9 +25,7 @@ export const DefaultEntities = [
   PostImage,
   UserImage,
   CommentImage,
-
   RequestMakeFriend,
-
   EmailOtp,
 
 ];

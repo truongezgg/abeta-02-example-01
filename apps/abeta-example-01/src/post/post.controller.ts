@@ -16,6 +16,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { User } from '@app/jwt-authentication/user.decorator';
 import { LiteralObject } from '@nestjs/common/cache';
+import { AuthUser } from '../auth/decorators/user.decorator';
 
 class requestUser {
   id: number;
@@ -29,15 +30,15 @@ export class PostController {
   //Create Post
   @ApiBearerAuth()
   @Post()
-  create(@Body() createPostDto: CreatePostDto, @User() user: requestUser) {
-    return this.postService.create({ ...createPostDto }, user.id);
+  create(@Body() createPostDto: CreatePostDto, @AuthUser() { id }) {
+    return this.postService.create({ ...createPostDto }, id);
   }
 
   // Get all post of user
   @ApiBearerAuth()
   @Get()
   async findAll(
-    @User() user: LiteralObject,
+    @AuthUser() user: LiteralObject,
     @Query('page', ParseIntPipe) page?: number,
     @Query('pageSize', ParseIntPipe) pageSize?: number,
   ) {
@@ -62,7 +63,7 @@ export class PostController {
   // Review a Post
   @ApiBearerAuth()
   @Get(':id')
-  async findOne(@Param('id') id: string, @User() user) {
+  async findOne(@Param('id') id: string, @AuthUser() user) {
     const post = await this.postService.findOne(parseInt(id), user.id);
     if (post === null)
       return {

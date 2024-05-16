@@ -4,8 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import User from '@app/database-type-orm/entities/User';
 import { Repository } from 'typeorm';
 import { Exception } from '@app/core/exception';
-import { ErrorCode } from '@app/core/constants/enum';
-
+import { ErrorCode, IsCurrent } from '@app/core/constants/enum';
 import { JwtAuthenticationService } from '@app/jwt-authentication';
 
 // import { access } from 'fs';
@@ -25,7 +24,7 @@ export class UserService {
     private firebaseService: FirebaseService,
   ) {}
 
-  public async create(user: any) {
+  public async create(user: any){
     const newUser = this.userRepository.create(user);
     return await this.userRepository.save(newUser);
   }
@@ -117,13 +116,13 @@ export class UserService {
       where: {
         userId: id,
         image_type: 1,
-        isAvatar: true,
+        isCurrentAvatar: IsCurrent.IS_CURRENT,
       },
     });
     if (oldAvatar) {
       await this.imageRepository.update(
         { id: oldAvatar.id },
-        { isAvatar: false },
+        { isCurrentAvatar: IsCurrent.IS_OLD },
       );
     }
     await this.imageRepository.save({
