@@ -16,7 +16,7 @@ import { UserService } from '../user/user.service';
 import { Request } from 'express';
 import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-import { addMinutes, format } from 'date-fns';
+import { addMinutes, format, subMinutes } from 'date-fns';
 import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { NodeMailerService } from '@app/node-mailer';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
@@ -59,7 +59,11 @@ export class AuthService {
     });
     const newUser = await this.userRepository.save(user);
     //send otp for verify
-    await this.sendOtp(newUser, OTPCategory.REGISTER);
+    try {
+      await this.sendOtp(newUser, OTPCategory.REGISTER);
+    } catch (Exception) {
+      throw new Exception(ErrorCode.Cannot_Send_Mail);
+    }
     //tokens
     return this.generateTokensAndSave(newUser);
   }
@@ -90,7 +94,7 @@ export class AuthService {
       where: {
         id: payload.id,
       },
-      select: ['email', 'name', 'phoneNumber', 'dateOfBirth', 'address']
+      select: ['email', 'name', 'phoneNumber', 'dateOfBirth', 'address'],
     });
     return user;
   }
@@ -230,6 +234,17 @@ export class AuthService {
   }
 
   async sendOtp(user: User, otpType: number) {
+    //check otp frequency
+    const fiveMinutesAgo = subMinutes(new Date(), 5);
+    const maxOtpInFiveMins = 5;
+    const otpCountLastFiveMins = await this.otpRepository
+      .createQueryBuilder('otp')
+      .where('otp.user_id = :userId', { userId: user.id })
+      .andWhere('otp.createdAt > :fiveMinutesAgo', { fiveMinutesAgo })
+      .getCount();
+    if (otpCountLastFiveMins >= maxOtpInFiveMins) {
+      throw new Exception(ErrorCode.Too_Many_Requests);
+    }
     //get current otp of user in data
     const otpRecords = await this.otpRepository
       .createQueryBuilder('otp')
@@ -273,10 +288,12 @@ export class AuthService {
       otpType === OTPCategory.REGISTER ? './verify' : './reset-password',
       { otp },
     );
+    return {
+      message: 'Check your email',
+    };
   }
 
   private async generateTokensAndSave(user: User) {
-    console.log(user);
     const accessToken = this.jwtAuthService.generateAccessToken({
       id: user.id,
       email: user.email,

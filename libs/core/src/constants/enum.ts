@@ -46,6 +46,7 @@ export enum ErrorCode {
   Post_Not_Found = 'Post_Not_Found',
   Comment_Not_Found = 'Comment_Not_Found',
   Notification_Not_Found = 'Notification_Not_Found',
+  Cannot_Send_Mail = 'Cannot_Send_Mail',
 }
 
 export enum Environment {

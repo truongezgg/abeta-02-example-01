@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import User from '@app/database-type-orm/entities/User';
 import { Repository } from 'typeorm';
 import { Exception } from '@app/core/exception';
-import { ErrorCode, IsCurrent } from '@app/core/constants/enum';
+import { ErrorCode, IsCurrent, UserImageType } from "@app/core/constants/enum";
 import { JwtAuthenticationService } from '@app/jwt-authentication';
 
 // import { access } from 'fs';
@@ -83,7 +83,8 @@ export class UserService {
       await this.imageRepository.save({
         url: imageUrl,
         userId: id,
-        image_type: 2,
+        image_type: 0,
+        isCurrentAvatar: null,
       });
 
       const stream = fileUpload.createWriteStream({

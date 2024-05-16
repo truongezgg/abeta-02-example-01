@@ -7,6 +7,7 @@ import {
   Put,
   Query,
   Req,
+  Res,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { LoginAuthDto, RegisterAuthDto } from './dtos/login.dto';
@@ -18,8 +19,8 @@ import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { AuthUser } from './decorators/user.decorator';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
-import { OTPCategory } from "@app/core/constants/enum";
-import { VerifyDto } from "./dtos/verify.dto";
+import { OTPCategory } from '@app/core/constants/enum';
+import { VerifyDto } from './dtos/verify.dto';
 
 @ApiBearerAuth()
 @ApiTags('Auth')
@@ -78,7 +79,7 @@ export class AuthController {
   }
 
   @Post('send-mail-verify')
-  sendMailVerify(@AuthUser() user){
+  sendMailVerify(@AuthUser() user) {
     return this.authService.sendOtp(user, OTPCategory.REGISTER);
   }
 }

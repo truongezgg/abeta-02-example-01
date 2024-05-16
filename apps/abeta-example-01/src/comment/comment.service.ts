@@ -8,7 +8,7 @@ import { Post } from '@app/database-type-orm/entities/Post.entity';
 import Comment from '@app/database-type-orm/entities/Comment.entity';
 import { CommentDto } from './dto/comment.dto';
 import { Exception } from '@app/core/exception';
-import { CommonStatus, ErrorCode } from '@app/core/constants/enum';
+import { CommonStatus, ErrorCode, IsCurrent } from "@app/core/constants/enum";
 import { v2 as cloudinary } from 'cloudinary';
 import { assignPaging, returnPaging } from '@app/helpers/utils';
 import CommentImage from '@app/database-type-orm/entities/CommentImage.entity';
@@ -115,7 +115,7 @@ export class CommentService {
 
     comments.forEach(async (cmt, i) => {
       const userImage = await this.userImageRepository.findOne({
-        where: { userId: +cmt.userId, isAvatar: true },
+        where: { userId: +cmt.userId, isCurrentAvatar: IsCurrent.IS_CURRENT },
         select: ['url'],
       });
       const user = {

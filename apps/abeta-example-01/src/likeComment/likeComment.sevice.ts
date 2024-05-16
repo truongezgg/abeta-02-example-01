@@ -4,7 +4,7 @@ import User from '@app/database-type-orm/entities/User';
 import { InjectRepository } from '@nestjs/typeorm';
 import Comment from '@app/database-type-orm/entities/Comment.entity';
 import { Exception } from '@app/core/exception';
-import { CommonStatus, ErrorCode } from '@app/core/constants/enum';
+import { CommonStatus, ErrorCode, IsCurrent } from "@app/core/constants/enum";
 import LikeComment from '@app/database-type-orm/entities/likeComment.entity';
 import { assignPaging, returnPaging } from '@app/helpers/utils';
 import { NotificationService } from '../notification/notification.service';
@@ -144,7 +144,7 @@ export class LikeCommentService {
 
     likeComments.forEach(async (likeCmt, i) => {
       const userImage = await this.userImageRepository.findOne({
-        where: { userId: +likeCmt.userId, isAvatar: true },
+        where: { userId: +likeCmt.userId, isCurrentAvatar: IsCurrent.IS_CURRENT},
         select: ['url'],
       });
       const user = {
