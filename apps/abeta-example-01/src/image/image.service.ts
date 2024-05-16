@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 // import { CreateImageDto } from './dto/create-image.dto';
 // import { UpdateImageDto } from './dto/update-image.dto';
 import { FirebaseStorageService } from '@app/firebase-storage';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from 'firebase/storage';
+// import {
+//   getDownloadURL,
+//   getStorage,
+//   ref,
+//   uploadBytesResumable,
+// } from 'firebase/storage';
 // import { error } from 'console';
 
 @Injectable()
@@ -53,47 +53,47 @@ export class ImageService {
         });
     }
 
-    return null;
+    return [];
   }
-  async uploadImageV2(files: any[]) {
-    try {
-      this.firebaseStorageService.getStorageInstance();
-      for (let i = 0; i < files.length; i++) {
-        const dateTime = this.giveCurrentDateTime();
-        const storage = getStorage();
-        const storageRef = ref(
-          storage,
-          `files/${files[i].originalname + '       ' + dateTime}`,
-        );
+  // async uploadImageV2(files: any[]) {
+  //   try {
+  //     this.firebaseStorageService.getStorageInstance();
+  //     for (let i = 0; i < files.length; i++) {
+  //       const dateTime = this.giveCurrentDateTime();
+  //       const storage = getStorage();
+  //       const storageRef = ref(
+  //         storage,
+  //         `files/${files[i].originalname + '       ' + dateTime}`,
+  //       );
 
-        // Create file metadata including the content type
-        const metadata = {
-          contentType: files[i].mimetype,
-        };
+  //       // Create file metadata including the content type
+  //       const metadata = {
+  //         contentType: files[i].mimetype,
+  //       };
 
-        // Upload the file in the bucket storage
-        const snapshot = await uploadBytesResumable(
-          storageRef,
-          files[i].buffer,
-          metadata,
-        );
-        //by using uploadBytesResumable we can control the progress of uploading like pause, resume, cancel
+  //       // Upload the file in the bucket storage
+  //       const snapshot = await uploadBytesResumable(
+  //         storageRef,
+  //         files[i].buffer,
+  //         metadata,
+  //       );
+  //       //by using uploadBytesResumable we can control the progress of uploading like pause, resume, cancel
 
-        // Grab the public url
-        const downloadURL = await getDownloadURL(snapshot.ref);
+  //       // Grab the public url
+  //       const downloadURL = await getDownloadURL(snapshot.ref);
 
-        console.log('File successfully uploaded.');
-        return {
-          message: 'file uploaded to firebase storage',
-          name: files[i].originalname,
-          type: files[i].mimetype,
-          downloadURL: downloadURL,
-        };
-      }
-    } catch (error) {
-      return error;
-    }
-  }
+  //       console.log('File successfully uploaded.');
+  //       return {
+  //         message: 'file uploaded to firebase storage',
+  //         name: files[i].originalname,
+  //         type: files[i].mimetype,
+  //         downloadURL: downloadURL,
+  //       };
+  //     }
+  //   } catch (error) {
+  //     return error;
+  //   }
+  // }
   giveCurrentDateTime = () => {
     const today = new Date();
     const date =

@@ -1,4 +1,9 @@
+import { IsNotEmpty, IsOptional } from 'class-validator';
+
 export class CreatePostImageDto {
+  @IsNotEmpty()
   postId: number;
-  files: Array<any>;
+
+  @IsOptional()
+  files?: Array<any>;
 }
