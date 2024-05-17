@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { MODULE_OPTIONS_TOKEN } from '@app/sendgrid/sendgrid.module-definition';
 import { SendGridModuleOptions } from '@app/sendgrid/sendgrid.interface';
-import * as sendGrid from '@sendgrid/mail';
+// import * as sendGrid from '@sendgrid/mail';
 import * as path from 'path';
 import { readFile } from 'fs/promises';
 import * as ejs from 'ejs';

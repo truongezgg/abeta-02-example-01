@@ -214,4 +214,3 @@ export class RequestMakeFriendService {
     return `This action removes a #${id} requestMakeFriend`;
   }
 }
-

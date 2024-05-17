@@ -13,7 +13,7 @@ import {
   VerifiedStatus,
 } from '@app/core/constants/enum';
 import { UserService } from '../user/user.service';
-import { Request } from 'express';
+// import { Request } from 'express';
 import EmailOtp from '@app/database-type-orm/entities/EmailOtp.entity';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { addMinutes, format } from 'date-fns';
@@ -21,7 +21,7 @@ import { ForgetPasswordDto } from './dtos/forgetPassword.dto';
 import { NodeMailerService } from '@app/node-mailer';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { Cron } from '@nestjs/schedule';
-import { SendgridService } from '@app/sendgrid';
+// import { SendgridService } from '@app/sendgrid';
 import * as process from 'process';
 require('dotenv').config();
 @Injectable()
@@ -34,7 +34,7 @@ export class AuthService {
     private jwtAuthService: JwtAuthenticationService,
     private userService: UserService,
     private mailService: NodeMailerService,
-    private sendGridService: SendgridService,
+    // private sendGridService: SendgridService,
   ) {}
 
   public async register(registerDto: RegisterAuthDto) {
@@ -90,7 +90,7 @@ export class AuthService {
       where: {
         id: payload.id,
       },
-      select: ['email', 'name', 'phoneNumber', 'dateOfBirth', 'address']
+      select: ['email', 'name', 'phoneNumber', 'dateOfBirth', 'address'],
     });
     return user;
   }
