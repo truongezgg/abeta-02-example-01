@@ -13,7 +13,7 @@ import {
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { User } from '@app/jwt-authentication/user.decorator';
 import { LiteralObject } from '@nestjs/common/cache';
 import { AuthUser } from '../auth/decorators/user.decorator';
@@ -51,13 +51,13 @@ export class PostController {
   @ApiBearerAuth()
   @Get('/friendpost')
   async findAllFriendPost(
-    @User() user: LiteralObject,
+    @AuthUser() { id },
     @Query('page', ParseIntPipe) page?: number,
     @Query('pageSize', ParseIntPipe) pageSize?: number,
   ) {
     page = page || 1;
     pageSize = pageSize || 10;
-    return await this.postService.findAllFriendPosts(user.id, page, pageSize);
+    return await this.postService.findAllFriendPosts(id, page, pageSize);
   }
 
   // Review a Post

@@ -115,7 +115,7 @@ export class CommentService {
 
     comments.forEach(async (cmt, i) => {
       const userImage = await this.userImageRepository.findOne({
-        where: { userId: +cmt.userId, isAvatar: true },
+        where: { userId: +cmt.userId, isCurrentAvatar: 1 },
         select: ['url'],
       });
       const user = {

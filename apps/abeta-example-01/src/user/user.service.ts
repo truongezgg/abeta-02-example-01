@@ -24,7 +24,7 @@ export class UserService {
     private firebaseService: FirebaseService,
   ) {}
 
-  public async create(user: any){
+  public async create(user: any) {
     const newUser = this.userRepository.create(user);
     return await this.userRepository.save(newUser);
   }
@@ -129,7 +129,7 @@ export class UserService {
       url: imageUrl,
       userId: id,
       image_type: 1,
-      isAvatar: true,
+      isCurrentAvatar: 1,
     });
     const stream = fileUpload.createWriteStream({
       metadata: {

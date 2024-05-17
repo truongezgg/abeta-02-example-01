@@ -74,28 +74,40 @@ export class PostService {
   async findAllFriendPosts(userId: number, page: number, pageSize: number) {
     try {
       const skip = (page - 1) * pageSize;
-      const allFriend = (
-        await this.requestMakeFriendService.findAll(page, pageSize, userId)
-      ).arrayPosts;
-      const arrayNew = [];
-      let sum = 0;
-      if (allFriend.length > 0) {
-        for (let i = 0; i < allFriend.length; i++) {
-          const [all, count] = await this.postRepository
-            .createQueryBuilder('post')
-            .innerJoinAndSelect('post.user', 'user', 'user.id = :id', {
-              id: allFriend[i].id,
-            })
-            .take(pageSize)
-            .skip(skip)
-            .getManyAndCount();
-          arrayNew.push(all);
-          sum += count;
-        }
-      }
+      const [all, count] = await this.postRepository
+        .createQueryBuilder('post')
+        .innerJoinAndSelect('post.user', 'user') // Join từ post tới user
+        // Join từ user tới friend
+        .innerJoinAndSelect(
+          'user.requestReceiver',
+          'f',
+          `(
+          f.receiverId = :myId AND f.senderId = user.id
+          OR
+          f.senderId = :myId  AND f.receiverId = user.id
+        )`,
+          { myId: userId },
+        )
+        .leftJoinAndSelect('post.image', 'y')
+        .leftJoinAndSelect('user.images', 'images')
+        // Join từ post tới image
+        .select([
+          'post',
+          'user.email',
+          'y.id',
+          'images.url',
+          'y.url',
+          'user.id',
+        ])
+        .take(pageSize)
+        .skip(skip)
+        .getManyAndCount();
+      // arrayNew.push(all);
+      // sum += count;
+      // }
       return {
-        arrayPost: arrayNew,
-        countPost: sum,
+        arrayPost: all,
+        countPost: count,
       };
     } catch {
       throw new HttpException(
