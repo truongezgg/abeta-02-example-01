@@ -21,10 +21,10 @@ export class RequestMakeFriendService {
   ) {}
 
   // gui loi moi ket ban
-  async create(createRequestMakeFriendDto: CreateRequestMakeFriendDto) {
+  async create(id, createRequestMakeFriendDto: CreateRequestMakeFriendDto) {
     try {
       const creater = this.requestMakeFriendRepository.create({
-        senderId: createRequestMakeFriendDto.senderId,
+        senderId: id,
         receiverId: createRequestMakeFriendDto.receiverId,
       });
 

@@ -38,11 +38,8 @@ export class RequestMakeFriendController {
     @Body() createRequestMakeFriendDto: CreateRequestMakeFriendDto,
     @AuthUser() { id },
   ) {
-    const creater = {
-      senderId: id,
-      receiverId: createRequestMakeFriendDto.receiverId,
-    }
-    return this.requestMakeFriendService.create(creater);
+
+    return this.requestMakeFriendService.create(id, createRequestMakeFriendDto);
   }
   // @Public()
   @Get('/listidfriends')
