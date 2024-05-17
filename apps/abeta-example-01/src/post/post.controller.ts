@@ -96,13 +96,13 @@ export class PostController {
   @ApiBearerAuth()
   @Get('/friendpost')
   async findAllFriendPost(
-    // @AuthUser() user: { id },
+    @AuthUser() { id },
     @Query('page', ParseIntPipe) page?: number,
     @Query('pageSize', ParseIntPipe) pageSize?: number,
   ) {
     page = page || 1;
     pageSize = pageSize || 10;
-    return await this.postService.findAllFriendPosts(1, page, pageSize);
+    return await this.postService.findAllFriendPosts(id, page, pageSize);
   }
 
   // Review a Post

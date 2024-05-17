@@ -12,7 +12,12 @@ import {
 import { RequestMakeFriendService } from './request_make_friend.service';
 // import { CreateRequestMakeFriendDto } from './dto/create-request_make_friend.dto';
 import { UpdateRequestMakeFriendDto } from './dto/update-request_make_friend.dto';
+
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+
+
+
 
 import { AuthUser } from '../auth/decorators/user.decorator';
 import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';
@@ -29,11 +34,14 @@ export class RequestMakeFriendController {
   ) {}
 
   @Post()
-  create(@Body() bodyObj: BodyObj, @AuthUser() user: { id }) {
+  create(
+    @Body() createRequestMakeFriendDto: CreateRequestMakeFriendDto,
+    @AuthUser() { id },
+  ) {
     const creater = {
-      senderId: user.id,
-      receiverId: bodyObj.receiverId,
-    };
+      senderId: id,
+      receiverId: createRequestMakeFriendDto.receiverId,
+    }
     return this.requestMakeFriendService.create(creater);
   }
   // @Public()

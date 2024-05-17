@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { IsDateString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateRequestMakeFriendDto {
@@ -20,4 +21,5 @@ export class CreateRequestMakeFriendDto {
   @IsOptional()
   @IsDateString()
   updatedAt?: string;
+
 }
