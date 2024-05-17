@@ -5,14 +5,14 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  // Delete,
   Query,
   ParseIntPipe,
 } from '@nestjs/common';
 import { RequestMakeFriendService } from './request_make_friend.service';
-import { CreateRequestMakeFriendDto } from './dto/create-request_make_friend.dto';
+// import { CreateRequestMakeFriendDto } from './dto/create-request_make_friend.dto';
 import { UpdateRequestMakeFriendDto } from './dto/update-request_make_friend.dto';
-import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthUser } from '../auth/decorators/user.decorator';
 import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';
@@ -140,4 +140,3 @@ export class RequestMakeFriendController {
   //   return this.requestMakeFriendService.remove(+id);
   // }
 }
-

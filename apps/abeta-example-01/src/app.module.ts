@@ -8,7 +8,7 @@ import { dataSource } from '@app/database-type-orm/data-source';
 import config, {
   IConfig,
   IConfigAuth,
-  IConfigSendGrid,
+  // IConfigSendGrid,
   // validateConfig,
 } from './config';
 import {
@@ -29,7 +29,7 @@ import { LikeCommentModule } from './likeComment/likeComment.module';
 import { LikePostModule } from './likePost/likePost.module';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { SendgridModule } from '@app/sendgrid';
+// import { SendgridModule } from '@app/sendgrid';
 import { UploadFileModule } from './upload-file/upload-file.module';
 import { ImageModule } from './image/image.module';
 import { PostImageModule } from './post-image/post-image.module';
@@ -59,13 +59,13 @@ import { PostImageModule } from './post-image/post-image.module';
       },
       inject: [ConfigService],
     }),
-    SendgridModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService<IConfig, true>) => ({
-        ...configService.get<IConfigSendGrid>('sendGrid'),
-      }),
-      inject: [ConfigService],
-    }),
+    // SendgridModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: (configService: ConfigService<IConfig, true>) => ({
+    //     ...configService.get<IConfigSendGrid>('sendGrid'),
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
