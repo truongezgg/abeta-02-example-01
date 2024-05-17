@@ -9,7 +9,7 @@ import config, {
   IConfig,
   IConfigAuth,
   IConfigSendGrid,
-  validateConfig,
+  // validateConfig,
 } from './config';
 import {
   JwtAuthenticationGuard,
@@ -40,7 +40,7 @@ import { PostImageModule } from './post-image/post-image.module';
       isGlobal: true,
       load: [() => config],
       cache: true,
-      validate: validateConfig,
+      // validate: validateConfig,
     }),
     JwtAuthenticationModule.registerAsync({
       imports: [ConfigModule],

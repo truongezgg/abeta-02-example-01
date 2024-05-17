@@ -1,36 +1,26 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Injectable } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import path from "path";
-import * as firebase from "firebase-admin";
 const { getStorage, getDownloadURL } = require('firebase-admin/storage');
-require('dotenv').config();
-
 @Injectable()
 export class FirebaseStorageService {
   private readonly storage: admin.storage.Storage;
 
   constructor() {
-    // // eslint-disable-next-line @typescript-eslint/no-var-requires
-    // const serviceAccount = require('../../../Key.json');
-    // admin.initializeApp({
-    //   credential: admin.credential.cert(serviceAccount),
-    //   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    // });
-    // this.storage = admin.storage();
-    // const serviceAccountPath = require('Key.json');
-    // firebase.initializeApp({
-    //   credential: firebase.credential.cert(serviceAccountPath),
-    //   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    // });
-    // this.storage = firebase.storage();
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const serviceAccount = require('./hadesproject-21965-firebase-adminsdk-irhf2-590aa3bca9.json');
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      storageBucket: 'gs://hadesproject-21965.appspot.com',
+    });
+    this.storage = admin.storage();
   }
   getStorageInstance(): admin.storage.Storage {
     return this.storage;
   }
   async getDownloadURL(filePath: string) {
     const fileRef = getStorage(this.getStorageInstance())
-      .bucket(process.env.FIREBASE_STORAGE_BUCKET)
+      .bucket('gs://hadesproject-21965.appspot.com')
       .file(filePath);
     const downloadURL = await getDownloadURL(fileRef);
     return downloadURL;
