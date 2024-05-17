@@ -13,7 +13,12 @@ import { RequestMakeFriendService } from './request_make_friend.service';
 import { CreateRequestMakeFriendDto } from './dto/create-request_make_friend.dto';
 import { UpdateRequestMakeFriendDto } from './dto/update-request_make_friend.dto';
 import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+<<<<<<< HEAD
+import { User } from '@app/jwt-authentication/user.decorator';
+import { LiteralObject } from '@nestjs/common/cache';
+=======
 
+>>>>>>> 8119461c90b8962e511e518bb59c7a8d8b3c3cc2
 import { AuthUser } from '../auth/decorators/user.decorator';
 import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';
 class BodyObj {
@@ -29,11 +34,14 @@ export class RequestMakeFriendController {
   ) {}
 
   @Post()
-  create(@Body() bodyObj: BodyObj, @AuthUser() user: { id }) {
+  create(
+    @Body() createRequestMakeFriendDto: CreateRequestMakeFriendDto,
+    @AuthUser() { id },
+  ) {
     const creater = {
-      senderId: user.id,
-      receiverId: bodyObj.receiverId,
-    };
+      senderId: id,
+      receiverId: createRequestMakeFriendDto.receiverId,
+    }
     return this.requestMakeFriendService.create(creater);
   }
   // @Public()

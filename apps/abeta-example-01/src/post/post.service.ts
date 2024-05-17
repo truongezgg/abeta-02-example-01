@@ -102,14 +102,7 @@ export class PostService {
   async findAllFriendPosts(userId: number, page: number, pageSize: number) {
     try {
       const skip = (page - 1) * pageSize;
-      // const allFriend = (
-      //   await this.requestMakeFriendService.findAll(page, pageSize, userId)
-      // ).arrayPosts;
-      // const arrayNew = [];
-      // let sum = 0;
-      // if (allFriend.length > 0) {
-        // for (let i = 0; i < allFriend.length; i++) {
-         const [all, count] = await this.postRepository
+      const [all, count] = await this.postRepository
         .createQueryBuilder('post')
         .innerJoinAndSelect('post.user', 'user') // Join từ post tới user
         // Join từ user tới friend
@@ -137,14 +130,13 @@ export class PostService {
         .take(pageSize)
         .skip(skip)
         .getManyAndCount();
-          // arrayNew.push(all);
-          // sum += count;
-        // }
-        return {
-          arrayPost: all,
-          countPost: count,
-        };
-      }
+      // arrayNew.push(all);
+      // sum += count;
+      // }
+      return {
+        arrayPost: all,
+        countPost: count,
+      };
     } catch {
       throw new HttpException(
         'Internal Server',

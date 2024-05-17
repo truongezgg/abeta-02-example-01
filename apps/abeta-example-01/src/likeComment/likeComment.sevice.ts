@@ -113,13 +113,13 @@ export class LikeCommentService {
 
   async findUsersLikeComment(userLikeCommentDto) {
     const params = assignPaging(userLikeCommentDto);
-
-    const likeComments = await this.likeCommentRepository
+    const [likeComments, totalLikeComments] = await this.likeCommentRepository
       .createQueryBuilder('like_comment')
       .withDeleted()
       .leftJoinAndSelect('like_comment.user', 'user')
       .leftJoinAndSelect('like_comment.comment', 'comment')
       .leftJoinAndSelect('comment.post', 'post')
+      .leftJoinAndSelect('user.images', 'images')
       .where('like_comment.commentId = :commentId', {
         commentId: userLikeCommentDto.commentId,
       })
@@ -135,32 +135,10 @@ export class LikeCommentService {
       .andWhere('post.status = :postStatus', {
         postStatus: CommonStatus.ACTIVE,
       })
-      .select(['like_comment', 'user.id', 'user.name'])
+      .select(['like_comment', 'user.id', 'user.name', 'images.url'])
       .skip(params.skip)
       .take(params.pageSize)
-      .getMany();
-
-    console.log(likeComments);
-
-    likeComments.forEach(async (likeCmt, i) => {
-      const userImage = await this.userImageRepository.findOne({
-        where: { userId: +likeCmt.userId, isAvatar: true },
-        select: ['url'],
-      });
-      const user = {
-        ...likeCmt.user,
-        avatar: userImage.url,
-      };
-      likeCmt.user = user;
-    });
-
-    const totalLikeComments = await this.likeCommentRepository.count({
-      where: {
-        commentId: userLikeCommentDto.commentId,
-        status: CommonStatus.ACTIVE,
-      },
-      withDeleted: true,
-    });
+      .getManyAndCount();
 
     const pagingResult = returnPaging(likeComments, totalLikeComments, params);
 
