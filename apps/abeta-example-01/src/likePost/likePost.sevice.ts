@@ -7,6 +7,8 @@ import { Exception } from '@app/core/exception';
 import { CommonStatus, ErrorCode } from '@app/core/constants/enum';
 import { assignPaging, returnPaging } from '@app/helpers/utils';
 import { LikedPost } from '@app/database-type-orm/entities/LikedPost.entity';
+import { NotificationService } from '../notification/notification.service';
+import UserImage from '@app/database-type-orm/entities/UserImage.entity';
 
 @Injectable()
 export class LikePostService {
@@ -17,6 +19,9 @@ export class LikePostService {
     private readonly postRepository: Repository<Post>,
     @InjectRepository(LikedPost)
     private readonly likedPostRepository: Repository<LikedPost>,
+    @InjectRepository(UserImage)
+    private readonly userImageRepository: Repository<UserImage>,
+    private notificationService: NotificationService,
   ) {}
 
   async postLike(userId, postId) {
@@ -60,7 +65,18 @@ export class LikePostService {
       };
 
       await this.likedPostRepository.save(like_post);
-      throw new Exception('', '', HttpStatus.OK, 'Liked the post successfully');
+      this.notificationService.create(userId, {
+        title: 'Facebook',
+        content: `${user.name} đã like bài viết của bạn`,
+        receiverId: post.userId,
+        categoryId: 2,
+      });
+      return {
+        success: true,
+        status: HttpStatus.CREATED,
+        message: 'OK',
+        payload: 'Liked the post successfully',
+      };
     }
 
     if (likedPost.status === CommonStatus.ACTIVE) {
@@ -68,52 +84,58 @@ export class LikePostService {
         status: CommonStatus.INACTIVE,
         deletedAt: new Date().toISOString(),
       });
-      throw new Exception(
-        '',
-        '',
-        HttpStatus.OK,
-        'Remove liked the post successfully',
-      );
+      return {
+        success: true,
+        status: HttpStatus.CREATED,
+        message: 'OK',
+        payload: 'Remove liked the post successfully',
+      };
     }
 
     if (likedPost.status === CommonStatus.INACTIVE) {
       await this.likedPostRepository.update(likedPost.id, {
         status: CommonStatus.ACTIVE,
       });
-      throw new Exception('', '', HttpStatus.OK, 'Liked the post successfully');
+      this.notificationService.create(userId, {
+        title: 'Facebook',
+        content: `${user.name} đã like bài viết của bạn`,
+        receiverId: post.userId,
+        categoryId: 2,
+      });
+      return {
+        success: true,
+        status: HttpStatus.CREATED,
+        message: 'OK',
+        payload: 'Liked the post successfully',
+      };
     }
   }
 
   async findUsersLikePost(userLikePostDto) {
     const params = assignPaging(userLikePostDto);
 
-    const likePosts = await this.likedPostRepository.find({
-      where: {
+    const [likePosts, totalLikePosts] = await this.likedPostRepository
+      .createQueryBuilder('like_post')
+      .withDeleted()
+      .leftJoinAndSelect('like_post.user', 'user')
+      .leftJoinAndSelect('like_post.post', 'post')
+      .leftJoinAndSelect('user.images', 'images')
+      .where('like_post.postId = :postId', {
         postId: userLikePostDto.postId,
-        status: CommonStatus.ACTIVE,
-      },
-      relations: ['user'],
-      withDeleted: true,
-      skip: params.skip,
-      take: params.pageSize,
-    });
-
-    const totalLikePosts = await this.likedPostRepository.count({
-      where: {
-        postId: userLikePostDto.postId,
-        status: CommonStatus.ACTIVE,
-      },
-    });
+      })
+      .andWhere('post.status = :postStatus', {
+        postStatus: CommonStatus.ACTIVE,
+      })
+      .andWhere('like_post.status = :like_postStatus', {
+        like_postStatus: CommonStatus.ACTIVE,
+      })
+      .select(['like_post', 'user.id', 'user.name', 'images.url'])
+      .skip(params.skip)
+      .take(params.pageSize)
+      .getManyAndCount();
 
     const pagingResult = returnPaging(likePosts, totalLikePosts, params);
 
-    return {
-      likesPost: pagingResult.data.map((like) => ({
-        id: String(like.id),
-        user: {
-          name: like.user.name,
-        },
-      })),
-    };
+    return pagingResult;
   }
 }

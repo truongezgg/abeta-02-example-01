@@ -36,14 +36,16 @@ export class NotificationService {
       title: createDto.title,
       content: createDto.content,
       senderId: id,
-      categoryId: 3,
+      categoryId: createDto.categoryId,
     });
     const newUserNotification = await this.userNotificationRepository.save({
       receiverId: createDto.receiverId,
       notificationId: newNotification.id,
       read: false,
     });
+
     const msg = await this.oneSignal.pushNotification(
+      [receiver.id],
       newNotification.title,
       newNotification.content,
     );
@@ -123,11 +125,16 @@ export class NotificationService {
       where: {
         receiverId: id,
         deletedAt: null,
+        read: false,
       },
     });
     for (const notification of notifications) {
       notification.read = true;
       await this.notificationRepository.save(notification);
+      await this.userNotificationRepository.update(
+        { id: notification.id },
+        { read: true },
+      );
     }
     return notifications;
   }

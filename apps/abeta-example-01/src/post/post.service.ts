@@ -6,6 +6,9 @@ import { Post } from '@app/database-type-orm/entities/Post.entity';
 import { Repository } from 'typeorm';
 import { RequestMakeFriend } from '@app/database-type-orm/entities/ReuestMakeFriend.entity';
 import { RequestMakeFriendService } from '../request_make_friend/request_make_friend.service';
+
+import { PostImage } from '@app/database-type-orm/entities/postImage.entity';
+
 @Injectable()
 export class PostService {
   constructor(
@@ -14,20 +17,36 @@ export class PostService {
     @InjectRepository(RequestMakeFriend)
     private userRepository: Repository<RequestMakeFriend>,
     private requestMakeFriendService: RequestMakeFriendService,
+
+    @InjectRepository(PostImage)
+    private readonly postImageRepo: Repository<PostImage>,
   ) {}
 
   // tao bai post
-  create(createPostDto: CreatePostDto, userId: number) {
+  async create(createPostDto: CreatePostDto, userId: number, files: any) {
     try {
       const post = this.postRepository.create({
         title: createPostDto.title,
         content: createPostDto.content,
         userId,
       });
-
-      const result = this.postRepository.save(post);
+      const result = await this.postRepository.save(post);
+      const imageArray = [];
+      if (files.length > 0 && post.id) {
+        for (let i = 0; i < files.length; i++) {
+          const imagePost = this.postImageRepo.create({
+            postId: post.id,
+            url: files[i],
+          });
+          const text = await this.postImageRepo.save(imagePost);
+          imageArray.push(text);
+        }
+      }
       // if (result) return 'This action adds a new post';
-      return result;
+      return {
+        post: result,
+        imageArray,
+      };
     } catch {
       throw new HttpException(
         'Internal Server',
@@ -52,9 +71,18 @@ export class PostService {
       const skip = (page - 1) * pageSize;
       const [allPost, count] = await this.postRepository
         .createQueryBuilder('post')
-        .innerJoinAndSelect('post.user', 'user', 'user.id = :id', {
+        .innerJoin('post.user', 'user', 'user.id = :id', {
           id: userId,
         })
+        .innerJoin('post.image', 'image', 'image.postId')
+        .select('post')
+        .addSelect([
+          'user.id',
+          'user.email',
+          'image.id',
+          'image.postId',
+          'image.url',
+        ])
         .take(pageSize)
         .skip(skip)
         .getManyAndCount();
@@ -74,28 +102,40 @@ export class PostService {
   async findAllFriendPosts(userId: number, page: number, pageSize: number) {
     try {
       const skip = (page - 1) * pageSize;
-      const allFriend = (
-        await this.requestMakeFriendService.findAll(page, pageSize, userId)
-      ).arrayPosts;
-      const arrayNew = [];
-      let sum = 0;
-      if (allFriend.length > 0) {
-        for (let i = 0; i < allFriend.length; i++) {
-          const [all, count] = await this.postRepository
-            .createQueryBuilder('post')
-            .innerJoinAndSelect('post.user', 'user', 'user.id = :id', {
-              id: allFriend[i].id,
-            })
-            .take(pageSize)
-            .skip(skip)
-            .getManyAndCount();
-          arrayNew.push(all);
-          sum += count;
-        }
-      }
+      const [all, count] = await this.postRepository
+        .createQueryBuilder('post')
+        .innerJoinAndSelect('post.user', 'user') // Join từ post tới user
+        // Join từ user tới friend
+        .innerJoinAndSelect(
+          'user.requestReceiver',
+          'f',
+          `(
+          f.receiverId = :myId AND f.senderId = user.id
+          OR
+          f.senderId = :myId  AND f.receiverId = user.id
+        )`,
+          { myId: userId },
+        )
+        .leftJoinAndSelect('post.image', 'y')
+        .leftJoinAndSelect('user.images', 'images')
+        // Join từ post tới image
+        .select([
+          'post',
+          'user.email',
+          'y.id',
+          'images.url',
+          'y.url',
+          'user.id',
+        ])
+        .take(pageSize)
+        .skip(skip)
+        .getManyAndCount();
+      // arrayNew.push(all);
+      // sum += count;
+      // }
       return {
-        arrayPost: arrayNew,
-        countPost: sum,
+        arrayPost: all,
+        countPost: count,
       };
     } catch {
       throw new HttpException(

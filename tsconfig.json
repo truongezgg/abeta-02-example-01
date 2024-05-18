@@ -18,24 +18,66 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/config": ["libs/config/src"],
-      "@app/config/*": ["libs/config/src/*"],
-      "@app/core": ["libs/core/src"],
-      "@app/core/*": ["libs/core/src/*"],
-      "@app/helpers": ["libs/helpers/src"],
-      "@app/helpers/*": ["libs/helpers/src/*"],
-      "@app/database-type-orm": ["libs/database-type-orm/src"],
-      "@app/database-type-orm/*": ["libs/database-type-orm/src/*"],
-      "@app/jwt-authentication": ["libs/jwt-authentication/src"],
-      "@app/jwt-authentication/*": ["libs/jwt-authentication/src/*"],
-
-      "@app/exception-filter": ["libs/exception-filter/src"],
-      "@app/exception-filter/*": ["libs/exception-filter/src/*"],
-
-      "@app/node-mailer": ["libs/node-mailer/src"],
-      "@app/node-mailer/*": ["libs/node-mailer/src/*"],
-      "@app/s3-upload": ["libs/s3-upload/src"],
-      "@app/s3-upload/*": ["libs/s3-upload/src/*"]
+      "@app/config": [
+        "libs/config/src"
+      ],
+      "@app/config/*": [
+        "libs/config/src/*"
+      ],
+      "@app/core": [
+        "libs/core/src"
+      ],
+      "@app/core/*": [
+        "libs/core/src/*"
+      ],
+      "@app/helpers": [
+        "libs/helpers/src"
+      ],
+      "@app/helpers/*": [
+        "libs/helpers/src/*"
+      ],
+      "@app/database-type-orm": [
+        "libs/database-type-orm/src"
+      ],
+      "@app/database-type-orm/*": [
+        "libs/database-type-orm/src/*"
+      ],
+      "@app/jwt-authentication": [
+        "libs/jwt-authentication/src"
+      ],
+      "@app/jwt-authentication/*": [
+        "libs/jwt-authentication/src/*"
+      ],
+      "@app/exception-filter": [
+        "libs/exception-filter/src"
+      ],
+      "@app/exception-filter/*": [
+        "libs/exception-filter/src/*"
+      ],
+      "@app/node-mailer": [
+        "libs/node-mailer/src"
+      ],
+      "@app/node-mailer/*": [
+        "libs/node-mailer/src/*"
+      ],
+      "@app/s3-upload": [
+        "libs/s3-upload/src"
+      ],
+      "@app/s3-upload/*": [
+        "libs/s3-upload/src/*"
+      ],
+      "@app/sendgrid": [
+        "libs/sendgrid/src"
+      ],
+      "@app/sendgrid/*": [
+        "libs/sendgrid/src/*"
+      ],
+      "@app/firebase-storage": [
+        "libs/firebase-storage/src"
+      ],
+      "@app/firebase-storage/*": [
+        "libs/firebase-storage/src/*"
+      ]
     }
   }
 }

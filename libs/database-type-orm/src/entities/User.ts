@@ -1,5 +1,5 @@
 import { Post } from './Post.entity';
-import { CommonStatus } from '../../../core/src/constants/enum';
+import { CommonStatus, VerifiedStatus } from '../../../core/src/constants/enum';
 import {
   Column,
   CreateDateColumn,
@@ -12,15 +12,11 @@ import {
 
 import Notification from './Notification.entity';
 import UserNotification from './UserNotification.entity';
-
 import { LikedPost } from './LikedPost.entity';
-
 import LikeComment from './likeComment.entity';
 import Comment from './Comment.entity';
 import UserImage from './UserImage.entity';
-
 import { RequestMakeFriend } from './ReuestMakeFriend.entity';
-
 import EmailOtp from './EmailOtp.entity';
 
 @Entity('user')
@@ -58,6 +54,14 @@ export default class User {
     unsigned: true,
   })
   status: number;
+
+  @Column({
+    name: 'is_verified',
+    type: 'tinyint',
+    default: VerifiedStatus.NOT_VERIFIED,
+    unsigned: true,
+  })
+  isVerified: number;
 
   @Column({ name: 'reset_token', type: 'varchar', length: 100, nullable: true })
   resetToken: string;

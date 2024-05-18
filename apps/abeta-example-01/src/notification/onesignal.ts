@@ -22,9 +22,17 @@ export class OneSignal {
   }
 
   async pushNotification(
+    playerIds: number[],
     title: string,
     content: string,
   ): Promise<{ msg: string }> {
+    const filters = playerIds.map((id, index) => ({
+      field: 'tag',
+      key: 'user',
+      relation: '=',
+      value: id,
+    }));
+    console.log(filters);
     const notification: CreateNotificationBody = {
       headings: {
         en: title,
@@ -32,8 +40,10 @@ export class OneSignal {
       contents: {
         en: content,
       },
-      included_segments: [process.env.ONESIGNAL_INCLUDED_SEGMENTS],
+      filters: filters,
     };
+
+    console.log(notification);
 
     try {
       await this.client.createNotification(notification);

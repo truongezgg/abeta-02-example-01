@@ -1,32 +1,3 @@
-
-import { Body, Controller, Post } from '@nestjs/common';
-import { UserService } from './user.service';
-import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';
-import { JwtAuthenticationService } from '@app/jwt-authentication';
-
-class Payload {
-  username: string;
-  password: string;
-}
-@Controller('user')
-export class UserController {
-  constructor(
-    private userService: UserService,
-    private jwtAuthenticate: JwtAuthenticationService,
-  ) {}
-
-  @Public()
-  @Post('/signin')
-  async signIn(@Body() payload: Payload) {
-    return this.userService.validateUser(payload.username, payload.password);
-  }
-}
-
-/*
-{
-  "name":"tester1",
-  "password":"12345"
-=======
 import {
   Body,
   Controller,
@@ -35,17 +6,15 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtAuthenticationGuard } from '@app/jwt-authentication';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import User from '@app/database-type-orm/entities/User';
-import {
-  FileFieldsInterceptor,
-  FileInterceptor,
-} from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { AuthUser } from '../auth/decorators/user.decorator';
 
 @ApiBearerAuth()
 @Controller('user')
@@ -69,7 +38,34 @@ export class UserController {
     return this.userService.findOneByEmail(email);
   }
 
-  @Post('upload')
+  @Post('upload-images')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @UseInterceptors(FilesInterceptor('files'))
+  async uploadFile(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @AuthUser() { id },
+  ) {
+    const imageUrl = await this.userService.uploadImages(files, id);
+    return {
+      url: imageUrl,
+    };
+  }
+
+  @Post('upload-single-image')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -83,12 +79,13 @@ export class UserController {
     },
   })
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const imageUrl = await this.userService.uploadImage(file);
+  async uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @AuthUser() { id },
+  ) {
+    const imageUrl = await this.userService.uploadAvatar(file, id);
     return {
       url: imageUrl,
     };
   }
-
 }
-*/

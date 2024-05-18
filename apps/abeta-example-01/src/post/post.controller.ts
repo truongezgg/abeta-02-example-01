@@ -9,59 +9,106 @@ import {
   Delete,
   Query,
   ParseIntPipe,
+  UseInterceptors,
+  ParseFilePipeBuilder,
+  UploadedFiles,
+  HttpStatus,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { User } from '@app/jwt-authentication/user.decorator';
 import { LiteralObject } from '@nestjs/common/cache';
-
+import { AuthUser } from '../auth/decorators/user.decorator';
+import { Public } from '@app/jwt-authentication/jwt-authentication.decorator';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { title } from 'process';
+import { ImageService } from '../image/image.service';
+import { IsOptional } from 'class-validator';
+import { OptionalFileInterceptor } from '../image/OptionalFileInterceptor.middleware';
+import { OptionalParseFilePipe } from '../image/OptionalParseFilePipe.middleware';
 class requestUser {
   id: number;
   name: string;
 }
+@ApiTags('Post')
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly imageService: ImageService,
+  ) {}
 
   //Create Post
   @ApiBearerAuth()
-  @Post()
-  create(@Body() createPostDto: CreatePostDto, @User() user: requestUser) {
-    return this.postService.create({ ...createPostDto }, user.id);
+  @Public()
+  @Post('creater')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+        title: {
+          type: 'string',
+        },
+        content: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @UseInterceptors(OptionalFileInterceptor, FilesInterceptor('files'))
+  async create(
+    @UploadedFiles(OptionalParseFilePipe)
+    files: Array<Express.Multer.File>,
+    @Body() createPostDto: CreatePostDto,
+    // @AuthUser() { id },
+  ) {
+    const image = await this.imageService.uploadImage(files);
+    console.log(files);
+    return await this.postService.create({ ...createPostDto }, 1, image);
   }
 
   // Get all post of user
+  @Public()
   @ApiBearerAuth()
   @Get()
   async findAll(
-    @User() user: LiteralObject,
+    // @AuthUser() user: { id },
     @Query('page', ParseIntPipe) page?: number,
     @Query('pageSize', ParseIntPipe) pageSize?: number,
   ) {
     page = page || 1;
     pageSize = pageSize || 10;
-    return this.postService.findAllMyPosts(page, pageSize, user.id);
+    return this.postService.findAllMyPosts(page, pageSize, 1);
   }
 
   //Get all post of friend
+  @Public()
   @ApiBearerAuth()
   @Get('/friendpost')
   async findAllFriendPost(
-    @User() user: LiteralObject,
+    @AuthUser() { id },
     @Query('page', ParseIntPipe) page?: number,
     @Query('pageSize', ParseIntPipe) pageSize?: number,
   ) {
     page = page || 1;
     pageSize = pageSize || 10;
-    return await this.postService.findAllFriendPosts(user.id, page, pageSize);
+    return await this.postService.findAllFriendPosts(id, page, pageSize);
   }
 
   // Review a Post
   @ApiBearerAuth()
   @Get(':id')
-  async findOne(@Param('id') id: string, @User() user) {
+  async findOne(@Param('id') id: string, @AuthUser() user) {
     const post = await this.postService.findOne(parseInt(id), user.id);
     if (post === null)
       return {

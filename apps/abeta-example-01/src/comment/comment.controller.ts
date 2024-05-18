@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseInterceptors,
@@ -12,19 +11,18 @@ import {
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { CommentDto } from './dto/comment.dto';
-import { Auth } from '../auth/decorators/auth.decorator';
 import { AuthUser } from '../auth/decorators/user.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiBearerAuth()
 @ApiTags('comment')
 @Controller('comment')
-@Auth()
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @Post()
+  @Post('create')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
   async create(
@@ -41,12 +39,7 @@ export class CommentController {
     return this.commentService.findAll(commentDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') commentId: string) {
-    return this.commentService.findOne(+commentId);
-  }
-
-  @Post('edit:id')
+  @Post('edit/:id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
   update(
@@ -62,6 +55,11 @@ export class CommentController {
       userId,
       image,
     );
+  }
+
+  @Get(':id')
+  findOne(@Param('id') commentId: string) {
+    return this.commentService.findOne(+commentId);
   }
 
   @Delete(':id')

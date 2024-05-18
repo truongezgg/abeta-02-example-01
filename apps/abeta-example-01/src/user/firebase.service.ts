@@ -12,7 +12,7 @@ export class FirebaseService {
     // const serviceAccountPath = path.join(
     //   __dirname,
     //   '..',
-    //   'serviceAccountKey.json',
+    //   'Key.json',
     // );
     // firebase.initializeApp({
     //   credential: firebase.credential.cert(serviceAccountPath),

@@ -23,11 +23,11 @@ export class RequestMakeFriend {
 
   @Column({
     name: 'status',
-    type: 'boolean',
-    comment: 'true: accepted, false: havent ever accepted',
-    default: false,
+    type: 'int',
+    comment: '1: accepted, 0: havent ever accepted, 2: deleted req',
+    default: 0,
   })
-  status: boolean;
+  status: number;
 
   @ManyToOne(() => User, (user) => user.requestSender)
   @JoinColumn({ name: 'sender_id' })

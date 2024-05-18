@@ -9,12 +9,18 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import CommentImage from '@app/database-type-orm/entities/CommentImage.entity';
+import { NotificationModule } from '../notification/notification.module';
+import UserImage from '@app/database-type-orm/entities/UserImage.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Comment, Post, CommentImage]),
+    TypeOrmModule.forFeature([User, Comment, Post, CommentImage, UserImage]),
+    NotificationModule,
     MulterModule.register({
       storage: diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, 'uploads/');
+        },
         filename: (req, file, cb) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
